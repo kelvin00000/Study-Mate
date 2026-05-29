@@ -54,7 +54,7 @@ const SignUpPage = () => {
 
                     <div className="flex items-center justify-center mt-16 lg:mt-12 full h-[45%] bg-[#D7C5FB] rounded-2xl overflow-hidden">
                         <img
-                            src="../../../public/image-3.png"
+                            src="/image-3.png"
                             alt="Students learning"
                             className="mb-[8%] w-full lg:w-[65%] object-contain"
                         />
