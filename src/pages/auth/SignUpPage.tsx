@@ -18,7 +18,7 @@ const SignUpPage = () => {
             await signUp!.authenticateWithRedirect({
                 strategy: 'oauth_google',
                 redirectUrl: '/sso-callback',
-                redirectUrlComplete: '/onboarding',
+                redirectUrlComplete: '/onBoarding',
             })
 
             await fetch('https://studymate-backend-dhnt.onrender.com/auth/sync', {
