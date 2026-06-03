@@ -15,7 +15,7 @@ const LoadingScreen = ({ loading }: LoadingScreenProps) => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="
-                    fixed inset-0 z-[999]
+                    fixed inset-0 z-999
                     flex items-center justify-center
                     bg-black/25
                     backdrop-blur-md
@@ -77,7 +77,7 @@ const LoadingScreen = ({ loading }: LoadingScreenProps) => {
                         duration: 1.5,
                     }}
                     className="
-                        absolute bottom-[-50px]
+                        absolute -bottom-12.5
                         text-lg font-semibold
                         text-white
                     "
