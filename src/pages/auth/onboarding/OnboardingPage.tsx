@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import { AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Logo from "../../../components/Logo";
-import { onboardingSteps } from "./Onboardingdata";
+import { onboardingSteps } from "../../../constants/Onboardingdata";
 import StepForm from "./StepForm";
 import InterestsForm from "./InterestForm";
 import FinalOnboardingScreen from "./FinalOnboardingScreen";
 import MessageModal from "../../../components/Modal";
 import LoadingScreen from "../../../components/LoadingScreen";
+import { useSubmitPreference, useSyncUser } from "../../../hooks/useSubmitPreference";
 
 
 // type props = {
@@ -17,33 +19,43 @@ import LoadingScreen from "../../../components/LoadingScreen";
 // };
 
 export default function OnboardingPage() {
-    const { getToken } = useAuth()
-    const token = getToken()
+    const navigate = useNavigate();
+    const { user } = useUser();
     const [ step, setStep ] = useState(0);
     const [ onboardingInfo, setOnboardingInfo ] = useState<{selections: {title:string, selection:string}[], interests:string[]}>({selections:[], interests:[]})
     const [ latestStepSelection, setLatestStepSelection ] = useState<{title:string, selection:string}>()
     const [ selectedInterests, setSelectedInterests ] = useState<string[]>([])
     const [ showMessageModal, setShowMessageModal ] = useState(false)
     const [ showLoader, setShowLoader ] = useState(false)
+    const [ syncing, setSyncing ] = useState(true)
+    const { mutateAsync: submitPreference,isPending } = useSubmitPreference()
+    const syncUser = useSyncUser()
+
+    useEffect(() => {
+        if (user && user.publicMetadata?.onboarded === true) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
+
+    useEffect(() => {
+        syncUser.mutateAsync()
+            .catch((err) => console.error('Sync error (non-fatal):', err))
+            .finally(() => setSyncing(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
 
 
     const handleSendUserInfo = async () => {
+        if(isPending) return;
         setShowLoader(true);
         try {
-            await fetch('https://studymate-backend-dhnt.onrender.com/user/onboarding', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...onboardingInfo }),
-            })
-
+            await submitPreference(onboardingInfo);
+            await user!.reload();
+            navigate('/dashboard');
+        } catch (err) {
             setShowLoader(false);
-        }
-        catch (error) {
-            console.error(error);
-            setShowLoader(false);
+            console.error('Error submitting preferences:', err);
         }
     }
 
@@ -82,18 +94,21 @@ export default function OnboardingPage() {
         else if(step>5){
             // CALL ENDPOINT SEND FUNC
             await handleSendUserInfo();
+            return;
         }
 
         setStep((prev) => prev + 1);
         setLatestStepSelection(undefined);
     };
 
+    if (syncing) return <LoadingScreen loading={true} />;
+
     return (
         <>
             <title>On Boarding</title>
 
             <main className="h-screen bg-(--bg) p-2">
-                <section className="py-4 px-2.5 lg:px-5 w-full h-full rounded-[32px] bg-(--card)">
+                <section className="py-4 px-2.5 lg:px-5 w-full h-full rounded-4xl bg-(--card)">
                     <Logo subtitle="Learn. Focus. Achieve" />
 
                     <div className="flex items-center h-[94%]">
@@ -127,7 +142,7 @@ export default function OnboardingPage() {
                                     if(step>6) return;
                                     handleSubmit();
                                 }}
-                                className="mt-3 lg:mt-4 flex min-h-[55px] w-[90%] lg:w-[60%] items-center justify-between rounded-2xl bg-(--purple-primary) px-6 text-lg font-semibold text-white shadow-[0_10px_30px_rgba(125,74,244,0.25)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-pointer">
+                                className="mt-3 lg:mt-4 flex min-h-13.75 w-[90%] lg:w-[60%] items-center justify-between rounded-2xl bg-(--purple-primary) px-6 text-lg font-semibold text-white shadow-[0_10px_30px_rgba(125,74,244,0.25)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-pointer">
                                 <span>Continue</span>
 
                                 <div className="flex h-7 lg:h-9 w-7 lg:w-9 items-center justify-center rounded-full bg-white">

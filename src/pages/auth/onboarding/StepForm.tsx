@@ -37,7 +37,7 @@ const StepForm = ({ id, title, highlight, description, options, finalQuestion, s
             <div className="flex flex-col items-center mt-5 space-y-4 lg:space-y-2">
                 {options.map((option) => (
                     <label
-                        key={id}
+                        key={option.title}
                         className="flex lg:h-[50px] lg:w-[80%] w-full cursor-pointer items-center justify-between rounded-2xl lg:rounded-[10px] border border-(--border) bg-linear-to-r from-[#E9D5FF] via-[#C4B5FD] to-[#E9D5FF] p-3 lg:p-2 text-left transition hover:border-(--purple-accent)"
                     >
                         <div>

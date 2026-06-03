@@ -1,4 +1,4 @@
-import { useSignUp, useAuth} from '@clerk/clerk-react'
+import { useSignUp } from '@clerk/clerk-react'
 import { FcGoogle } from "react-icons/fc";
 import { useState } from 'react';
 import Logo from "../../components/Logo";
@@ -8,27 +8,16 @@ import LoadingScreen from '../../components/LoadingScreen';
 const SignUpPage = () => {
     const [ showLoader, setShowLoader ] = useState(false)
     const { signUp, isLoaded } = useSignUp()
-    const { getToken } = useAuth()
-    const token = getToken()
 
     const handleSignUp = async ()=>{
         setShowLoader(true)
-        if (!isLoaded || !token) return
+        if (!isLoaded) return
         try {
             await signUp!.authenticateWithRedirect({
                 strategy: 'oauth_google',
                 redirectUrl: '/sso-callback',
                 redirectUrlComplete: '/onBoarding',
             })
-
-            await fetch('https://studymate-backend-dhnt.onrender.com/auth/sync', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
-
-            setShowLoader(false)
         } catch (err) {
             console.error('Google sign-up error:', err);
             setShowLoader(false)
@@ -44,10 +33,10 @@ const SignUpPage = () => {
                 <section className="flex-col items-start p-6 h-full w-[97%] lg:w-[35%] overflow-hidden rounded-3xl bg-[#F2F0FD] shadow-xl shadow-gray-300">
                     <Logo subtitle="Your Smart Study Companion" />
 
-                    <div className="flex-col items-start mt-[40px] lg:mt-[30px] w-[90%] lg:w-[70%]">
+                    <div className="flex-col items-start mt-10 lg:mt-7.5 w-[90%] lg:w-[70%]">
                         <p className="font-bold block text-4xl lg:text-3xl">Learn More.</p>
                         <p className="font-bold block text-4xl lg:text-3xl text-(--primary)">Achieve More.</p>
-                        <div className="h-[20px] text-sm text-var(--muted)">
+                        <div className="h-5 text-sm text-var(--muted)">
                             Manage your courses, track progess and achieve your academic goals with ease.
                         </div>
                     </div>
