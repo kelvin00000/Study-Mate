@@ -1,29 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
-:root {
-    --background: #f8f9fa;
-    --foreground: #111827;
+@theme inline{
+    --color-background: #f8f9fa;
+    --color-foreground: #111827;
 
-    --primary: #6541F0;
-    --primary-foreground: #F2F0FD;
-    --secondary: #eef2ff;
+    --color-bgprimary: #6541F0;
+    --color-primary-foreground: #F2F0FD;
+    --color-secondary: #eef2ff;
 
-    --muted: #6b7280;
-    --hero-bg: #dbeafe;
+    --color-muted: #6b7280;
+    --color-hero-bg: #dbeafe;
 
-    --purple-primary: #7D4AF4;
-    --purple-accent: #6541F0;
+    --color-purple-primary: #7D4AF4;
+    --color-purple-accent: #6541F0;
 
-    --bg: #F6F4FF;
-    --card: #FFFFFF;
+    --color-bg: #F6F4FF;
+    --color-card: #FFFFFF;
 
-    --text-primary: #111827;
-    --text-secondary: #6B7280;
+    --color-text-primary: #111827;
+    --color-text-secondary: #6B7280;
 
-    --border: #E9E5F8;
+    --color-border: #E9E5F8;
 
-    --font-normal: Roboto;
+    --font-normal: Poppins;
     --font-bold: Archivo Black;
 }
 
