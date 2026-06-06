@@ -1,6 +1,5 @@
-import { Search, Bell, Settings, Plus, Zap, Menu } from 'lucide-react';
+import { Search, Bell, Plus, Zap, Menu } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
-import { Link } from 'react-router-dom';
 
 interface TopBarProps {
   onCreateNew: () => void;
