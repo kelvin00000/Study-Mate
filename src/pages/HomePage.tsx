@@ -18,7 +18,7 @@ const HomePage = () => {
   const recentCourses = courses.slice(0, 3);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="flex h-screen font-normal bg-[#F8F9FF] overflow-hidden">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -33,18 +33,12 @@ const HomePage = () => {
 
         <main className="flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-7">
           {/* Welcome + Streak */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-            <div>
-              <h1
-                className="text-2xl lg:text-3xl font-bold mb-1"
-                style={{
-                  fontFamily: 'Archivo Black, sans-serif',
-                  color: 'var(--text-primary)',
-                }}
-              >
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8 h-[40%]">
+            <div className='self-center mt-10 lg:mt-0 lg:w-[60%]'>
+              <h1 className="text-2xl lg:text-3xl mb-1 font-semibold">
                 Welcome back, {user?.firstName ?? 'Learner'}.
               </h1>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm text-muted">
                 {isLoading
                   ? 'Loading your courses...'
                   : courses.length > 0
@@ -56,7 +50,7 @@ const HomePage = () => {
           </div>
 
           {/* Your Courses */}
-          <section className="mb-8">
+          <section className="mt-10 lg:mt-0 mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2
                 className="text-base font-semibold"
@@ -78,12 +72,12 @@ const HomePage = () => {
                 {[1, 2, 3].map(n => (
                   <div
                     key={n}
-                    className="rounded-2xl border p-5 animate-pulse"
-                    style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', minHeight: 160 }}
+                    className="rounded-2xl bg-white p-5 animate-pulse"
+                    style={{ minHeight: 160 }}
                   >
-                    <div className="w-11 h-11 rounded-xl mb-4" style={{ backgroundColor: 'var(--secondary)' }} />
-                    <div className="h-4 rounded mb-2 w-3/4" style={{ backgroundColor: 'var(--secondary)' }} />
-                    <div className="h-3 rounded w-full" style={{ backgroundColor: 'var(--secondary)' }} />
+                    <div className="w-11 h-11 rounded-xl mb-4 bg-gray-100" />
+                    <div className="h-4 rounded mb-2 w-3/4 bg-gray-100" />
+                    <div className="h-3 rounded w-full bg-gray-100" />
                   </div>
                 ))}
               </div>
@@ -104,17 +98,13 @@ const HomePage = () => {
                 ))}
               </div>
             ) : (
-              <div
-                className="rounded-2xl border p-8 text-center"
-                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
-              >
-                <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
+              <div className="rounded-2xl bg-white p-8 text-center">
+                <p className="text-sm mb-3 text-muted">
                   No courses yet. Create your first one!
                 </p>
                 <button
                   onClick={() => setModalOpen(true)}
-                  className="text-sm font-semibold px-4 py-2 rounded-xl text-white transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: 'var(--primary)' }}
+                  className="text-sm font-semibold px-4 py-2 rounded-xl text-white bg-[#6063EE] transition-opacity hover:opacity-90"
                 >
                   Create Course
                 </button>
@@ -124,19 +114,13 @@ const HomePage = () => {
 
           {/* Featured recommendation */}
           <section>
-            <h2
-              className="text-base font-semibold mb-4"
-              style={{ color: 'var(--text-primary)' }}
-            >
+            <h2 className="text-[#6063EE] font-semibold mb-4">
               Recommended For You
             </h2>
             <div
-              className="rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-              style={{
-                background: 'linear-gradient(135deg, var(--primary) 0%, #9B5CF6 100%)',
-              }}
+              className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_15px_25px_rgba(0,0,0,0.1)] rounded-[20px]"
             >
-              <div className="text-white">
+              <div>
                 <div className="flex items-center gap-2 mb-2 opacity-80">
                   <BookOpen size={16} />
                   <span className="text-xs font-semibold uppercase tracking-wide">
@@ -150,13 +134,12 @@ const HomePage = () => {
                   Data Structures & Algorithms
                 </h3>
                 <p className="text-sm opacity-75">
-                  Build a strong CS foundation with structured topics.
+                  Build a strong CS foundation with 24 structured topics.
                 </p>
               </div>
               <button
                 onClick={() => setModalOpen(true)}
-                className="shrink-0 px-5 py-2.5 bg-white text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors"
-                style={{ color: 'var(--primary)' }}
+                className="shrink-0 px-5 py-2.5 bg-[#6063EE] text-sm text-[#FEFEFF] font-semibold rounded-xl transition-all cursor-pointer"
               >
                 Start Learning
               </button>

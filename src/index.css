@@ -28,6 +28,17 @@
     --font-bold: Archivo Black;
 }
 
+:root {
+    --primary: #6541F0;
+    --primary-foreground: #F2F0FD;
+    --secondary: #eef2ff;
+    --bg: #F6F4FF;
+    --card: #FFFFFF;
+    --border: #E9E5F8;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
