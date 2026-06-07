@@ -35,3 +35,23 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* KaTeX math rendering inside chat bubbles */
+.markdown-message .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+  margin: 0.5rem 0;
+}
+
+.markdown-message .katex {
+  font-size: 1em;
+}
+
+.markdown-message p:first-child {
+  margin-top: 0;
+}
+
+.markdown-message p:last-child {
+  margin-bottom: 0;
+}

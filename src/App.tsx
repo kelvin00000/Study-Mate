@@ -9,6 +9,10 @@ import {
   RequireOnboarded,
 } from "./components/RouteGuards";
 import HomePage from "./pages/HomePage";
+import CoursesPage from "./pages/CoursesPage";
+import CourseDetailPage from "./pages/CourseDetailPage";
+import TopicChatPage from "./pages/TopicChatPage";
+import TopicQuizPage from "./pages/TopicQuizPage";
 
 function App() {
   const location = useLocation();
@@ -34,6 +38,10 @@ function App() {
 
         <Route element={<RequireOnboarded />}>
           <Route path="/dashboard" element={<HomePage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:id" element={<CourseDetailPage />} />
+          <Route path="/courses/:courseId/topics/:topicIndex" element={<TopicChatPage />} />
+          <Route path="/courses/:courseId/topics/:topicIndex/quiz" element={<TopicQuizPage />} />
         </Route>
       </Route>
     </Routes>

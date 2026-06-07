@@ -2,6 +2,9 @@ import { useUser } from '@clerk/clerk-react';
 import { Navigate, Outlet } from 'react-router-dom';
 import LoadingScreen from './LoadingScreen';
 
+
+
+
 // Wraps routes that require the user to be signed in
 export const RequireAuth = () => {
     const { isLoaded, isSignedIn } = useUser();
@@ -9,6 +12,8 @@ export const RequireAuth = () => {
     if (!isSignedIn) return <Navigate to="/" replace />;
     return <Outlet />;
 };
+
+
 
 // Wraps routes that require onboarding to be complete
 export const RequireOnboarded = () => {
