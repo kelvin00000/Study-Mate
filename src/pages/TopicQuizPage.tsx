@@ -31,9 +31,6 @@ const TopicQuizPage = () => {
 
   // useCourse loads in parallel — only needed for result screen UI
   const { data: course } = useCourse(courseId);
-  const topicIdx = Number(topicIndex ?? "0");
-  const topic = course?.topics.find((t) => t.order === topicIdx);
-
   // Resolved color: use state immediately, fall back to loaded course data
   const courseColor = stateColor || course?.color || "var(--primary)";
 
