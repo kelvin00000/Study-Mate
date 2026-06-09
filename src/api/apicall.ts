@@ -5,7 +5,8 @@ export interface ApiError {
   details?: Record<string, string>;
 }
 export async function apiCall(url: string, options: RequestInit) {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const baseUrl = 'http://localhost:5000/api';
+  // import.meta.env.VITE_API_BASE_URL;
     
   const response = await fetch(`${baseUrl}${url}`, options);
 

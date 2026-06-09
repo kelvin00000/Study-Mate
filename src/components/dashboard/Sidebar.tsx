@@ -59,7 +59,8 @@ function SidebarContent({ onClose, onNewCourse }: { onClose: () => void; onNewCo
                 </button>
 
                 <Link
-                    to=""
+                    to="/settings"
+                    onClick={onClose}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm mb-0.5 text-[#476272] font-medium transition-all hover:bg-gray-100"
                     >
                     <Settings size={18} />
