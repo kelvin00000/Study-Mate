@@ -13,6 +13,7 @@ import CoursesPage from "./pages/CoursesPage";
 import CourseDetailPage from "./pages/CourseDetailPage";
 import TopicChatPage from "./pages/TopicChatPage";
 import TopicQuizPage from "./pages/TopicQuizPage";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   const location = useLocation();
@@ -42,6 +43,7 @@ function App() {
           <Route path="/courses/:id" element={<CourseDetailPage />} />
           <Route path="/courses/:courseId/topics/:topicIndex" element={<TopicChatPage />} />
           <Route path="/courses/:courseId/topics/:topicIndex/quiz" element={<TopicQuizPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
     </Routes>

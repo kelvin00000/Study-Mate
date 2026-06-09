@@ -470,7 +470,7 @@ const TopicChatPage = () => {
                   >
                     {streamingContent ? (
                       <div className="px-4 py-3">
-                        <MarkdownMessage content={streamingContent} />
+                        <MarkdownMessage content={streamingContent} isStreaming={true} />
                         <span
                           className="inline-block w-0.5 h-4 ml-0.5 animate-pulse align-middle"
                           style={{ backgroundColor: "var(--primary)" }}

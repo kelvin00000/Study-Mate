@@ -38,7 +38,7 @@ const MessageModal = ({ show, setShow, message }: MessageModalProps) => {
                             className="
                             absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-[#F3F0FF] transition hover:bg-[#E9E2FF]"
                         >
-                            <X size={20} className="text-[var(--purple-accent)]" />
+                            <X size={20} className="text-(--purple-accent)" />
                         </button>
 
                         <div
@@ -54,7 +54,7 @@ const MessageModal = ({ show, setShow, message }: MessageModalProps) => {
                             onClick={() => setShow(false)}
                             className="
                             mt-8 h-14 w-full rounded-2xl
-                            bg-[var(--purple-primary)]
+                            bg-(--purple-primary)
                             font-semibold text-white
                             transition hover:opacity-90"
                         >

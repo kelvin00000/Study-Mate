@@ -17,7 +17,7 @@ export function DailyStreak() {
 
             {/* XP bar */}
             <div>
-                <div className="flex justify-between text-xs opacity-70 mt-7 lg:mt-12">
+                <div className="flex justify-between text-xs mb-1 opacity-70 mt-7 lg:mt-12">
                     <span className="mb-2">Daily XP</span>
                     <span>
                         {CURRENT_XP}/{TARGET_XP}
