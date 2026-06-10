@@ -31,7 +31,7 @@ VITE_API_BASE_URL=...           # Backend base URL, e.g. http://localhost:3000
 - **TanStack Query** for all server state. Default staleTime: 5 min; `refetchOnWindowFocus: false`.
 - **react-router-dom v7**
 - **motion** (Framer Motion) for animations
-- **react-markdown + remark-math + rehype-katex** for markdown with LaTeX rendering (`<MarkdownMessage>` component)
+- **react-markdown + remark-math + rehype-katex + mermaid** for markdown with LaTeX and diagram rendering. `<MarkdownMessage>` handles text; `<MermaidBlock>` renders mermaid code fences client-side (`mermaid.render()`, theme: neutral, falls back to raw `<pre>` on error)
 
 ### Route Structure
 

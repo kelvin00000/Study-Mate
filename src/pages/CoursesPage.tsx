@@ -14,13 +14,23 @@ const CoursesPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<Filter>('all');
+  const [search, setSearch] = useState('');
   const { data: courses = [], isLoading } = useCourses();
 
-  const filtered = courses.filter((c: CourseListItem) => {
+  const tabFiltered = courses.filter((c: CourseListItem) => {
     if (activeFilter === 'in-progress') return c.progressPercent > 0 && c.progressPercent < 100;
     if (activeFilter === 'completed') return c.progressPercent === 100;
     return true;
   });
+
+  const q = search.trim().toLowerCase();
+  const filtered = q
+    ? tabFiltered.filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        c.description?.toLowerCase().includes(q) ||
+        c.topicTitles.some(t => t.toLowerCase().includes(q))
+      )
+    : tabFiltered;
 
   const counts = {
     all: courses.length,
@@ -46,6 +56,8 @@ const CoursesPage = () => {
         <TopBar
           onCreateNew={() => setModalOpen(true)}
           onMenuToggle={() => setSidebarOpen(true)}
+          searchValue={search}
+          onSearchChange={setSearch}
         />
 
         <main className="flex-1 p-6 lg:p-8">
@@ -135,6 +147,7 @@ const CoursesPage = () => {
                       progressPercent={course.progressPercent}
                       color={course.color}
                       icon={course.icon}
+                      imageUrl={course.imageUrl}
                     />
                   </Link>
                 ))}
@@ -142,23 +155,27 @@ const CoursesPage = () => {
             ) : (
               <div className="flex flex-col items-center justify-center py-24 text-center">
                 <div className="text-5xl mb-4">
-                  {activeFilter === 'all' ? '📭' : activeFilter === 'in-progress' ? '📖' : '🏆'}
+                  {q ? '🔍' : activeFilter === 'all' ? '📭' : activeFilter === 'in-progress' ? '📖' : '🏆'}
                 </div>
                 <p className="text-base font-medium" style={{ color: 'var(--text-primary)' }}>
-                  {activeFilter === 'all'
+                  {q
+                    ? `No courses found for "${search.trim()}"`
+                    : activeFilter === 'all'
                     ? 'No courses yet.'
                     : activeFilter === 'in-progress'
                     ? 'No in-progress courses yet.'
                     : 'No completed courses yet.'}
                 </p>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-                  {activeFilter === 'all'
+                  {q
+                    ? 'Try a different search term or clear the search.'
+                    : activeFilter === 'all'
                     ? 'Create your first course to get started.'
                     : activeFilter === 'in-progress'
                     ? 'Start a course to see it here.'
                     : 'Finish a course to see it here.'}
                 </p>
-                {activeFilter === 'all' && (
+                {!q && activeFilter === 'all' && (
                   <button
                     onClick={() => setModalOpen(true)}
                     className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"

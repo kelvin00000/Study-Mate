@@ -6,6 +6,8 @@ export interface CourseListItem {
   description: string;
   color: string;
   icon: string;
+  imageUrl: string | null;
+  topicTitles: string[];
   totalTopics: number;
   topicsCompleted: number;
   progressPercent: number;
@@ -37,6 +39,7 @@ export interface CoursePreview {
   icon: string;
   color: string;
   topics: string[];
+  imageUrl?: string | null;
 }
 
 export const postGenerateTopics = (token: string, title: string): Promise<CoursePreview> =>
@@ -61,4 +64,62 @@ export const postCompleteTopic = (
   apiCall(`/courses/${courseId}/topics/${topicId}/complete`, {
     method: "POST",
     headers: authHeaders(token),
+  });
+
+export const patchCourse = (
+  token: string,
+  id: string,
+  data: { title?: string; description?: string; icon?: string; color?: string },
+): Promise<CourseDetail> =>
+  apiCall(`/courses/${id}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  });
+
+export const deleteCourse = (token: string, id: string): Promise<{ success: boolean }> =>
+  apiCall(`/courses/${id}`, { method: "DELETE", headers: authHeaders(token) });
+
+export const postAddTopic = (
+  token: string,
+  courseId: string,
+  title: string,
+): Promise<CourseTopic> =>
+  apiCall(`/courses/${courseId}/topics`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ title }),
+  });
+
+export const patchTopic = (
+  token: string,
+  courseId: string,
+  topicId: string,
+  title: string,
+): Promise<CourseTopic> =>
+  apiCall(`/courses/${courseId}/topics/${topicId}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify({ title }),
+  });
+
+export const deleteTopic = (
+  token: string,
+  courseId: string,
+  topicId: string,
+): Promise<{ success: boolean }> =>
+  apiCall(`/courses/${courseId}/topics/${topicId}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+
+export const putReorderTopics = (
+  token: string,
+  courseId: string,
+  topicIds: string[],
+): Promise<{ success: boolean }> =>
+  apiCall(`/courses/${courseId}/topics/reorder`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify({ topicIds }),
   });

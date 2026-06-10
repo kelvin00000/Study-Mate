@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { TopBar } from '../components/dashboard/TopBar';
 import { DailyStreak } from '../components/dashboard/DailyStreak';
 import { CourseCard } from '../components/dashboard/CourseCard';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
+import { LeaderboardModal } from '../components/streak/LeaderboardModal';
+import { StreakMilestoneToast } from '../components/streak/StreakMilestoneToast';
 import { useCourses } from '../hooks/useCourses';
 
 const HomePage = () => {
   const { user } = useUser();
   const [modalOpen, setModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [activeMilestone, setActiveMilestone] = useState<7 | 30 | 100 | null>(null);
   const { data: courses = [], isLoading } = useCourses();
 
   const recentCourses = courses.slice(0, 3);
@@ -45,8 +50,16 @@ const HomePage = () => {
                   ? `You have ${courses.length} active course${courses.length !== 1 ? 's' : ''}. Keep the momentum going!`
                   : "You haven't started any courses yet. Create one to begin!"}
               </p>
+              <button
+                onClick={() => setLeaderboardOpen(true)}
+                className="mt-3 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-opacity hover:opacity-80"
+                style={{ backgroundColor: 'var(--secondary)', color: 'var(--primary)' }}
+              >
+                <Trophy size={13} />
+                Leaderboard
+              </button>
             </div>
-            <DailyStreak />
+            <DailyStreak onMilestone={(n) => setActiveMilestone(n)} />
           </div>
 
           {/* Your Courses */}
@@ -93,6 +106,7 @@ const HomePage = () => {
                       progressPercent={course.progressPercent}
                       color={course.color}
                       icon={course.icon}
+                      imageUrl={course.imageUrl}
                     />
                   </Link>
                 ))}
@@ -149,6 +163,15 @@ const HomePage = () => {
       </div>
 
       <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <LeaderboardModal open={leaderboardOpen} onClose={() => setLeaderboardOpen(false)} />
+      <AnimatePresence>
+        {activeMilestone && (
+          <StreakMilestoneToast
+            milestone={activeMilestone}
+            onDismiss={() => setActiveMilestone(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

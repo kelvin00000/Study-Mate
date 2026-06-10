@@ -25,6 +25,7 @@ import {
 import type { LearningObjective } from "../api/objectives";
 import { useChatHistory } from "../hooks/useChatHistory";
 import { useUserPreferences } from "../hooks/useUserPreferences";
+import { useRecordActivity } from "../hooks/useStreak";
 import { MarkdownMessage } from "../components/MarkdownMessage";
 
 // ── Typing indicator ───────────────────────────────────────────────────────
@@ -68,6 +69,7 @@ const TopicChatPage = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessage } = useTopicChat();
+  const { mutate: recordActivity } = useRecordActivity();
 
   const { data: course, isLoading: courseLoading } = useCourse(courseId);
   const topicIdx = Number(topicIndex ?? "0");
@@ -94,7 +96,8 @@ const TopicChatPage = () => {
 
   const objectivesData: LearningObjective[] = objectivesQuery.data ?? [];
   const coveredCount = objectivesData.filter((o) => o.covered).length;
-  const allCovered = objectivesData.length > 0 && coveredCount === objectivesData.length;
+  const allCovered =
+    objectivesData.length > 0 && coveredCount === objectivesData.length;
 
   const objectivesLoading =
     objectivesQuery.isLoading || generateObjectives.isPending;
@@ -107,7 +110,7 @@ const TopicChatPage = () => {
     queryClient.setQueryData(
       ["objectives", courseId, topic.id],
       (prev: LearningObjective[] | undefined) =>
-        prev?.map((o) => ({ ...o, covered: false }))
+        prev?.map((o) => ({ ...o, covered: false })),
     );
   }, [location.state?.resetObjectives, topic, courseId, queryClient]);
 
@@ -128,7 +131,7 @@ const TopicChatPage = () => {
         topicTitle: topic.title,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objectivesQuery.isSuccess, objectivesQuery.data?.length, course, topic]);
 
   const scrollToBottom = useCallback(() => {
@@ -143,7 +146,7 @@ const TopicChatPage = () => {
   const handleStream = useCallback(
     async (
       history: Message[],
-      save?: { topicId: string; userMessage: string }
+      save?: { topicId: string; userMessage: string },
     ): Promise<string> => {
       if (!course || !topicName) return "";
       setStreaming(true);
@@ -164,7 +167,7 @@ const TopicChatPage = () => {
             setStreaming(false);
             resolve(fullText);
           },
-          save
+          save,
         ).catch(() => {
           setStreamingContent("");
           setStreaming(false);
@@ -179,7 +182,7 @@ const TopicChatPage = () => {
         });
       });
     },
-    [course, topicName, sendMessage]
+    [course, topicName, sendMessage],
   );
 
   // ── Overview seed (runs once on mount) ───────────────────────────────────
@@ -209,7 +212,7 @@ const TopicChatPage = () => {
         (fullText) => {
           setOverview(fullText);
           setOverviewStreaming(false);
-        }
+        },
       ).catch(() => setOverviewStreaming(false));
     }
   }, [course, topicName, topic, sendMessage]);
@@ -219,11 +222,14 @@ const TopicChatPage = () => {
     (updatedMessages: Message[], aiResponse: string) => {
       if (!aiResponse || objectivesData.length === 0) return;
       evaluateObjectives.mutate({
-        messages: [...updatedMessages, { role: "assistant", content: aiResponse }],
+        messages: [
+          ...updatedMessages,
+          { role: "assistant", content: aiResponse },
+        ],
         objectiveTexts: objectivesData.map((o) => o.text),
       });
     },
-    [objectivesData, evaluateObjectives]
+    [objectivesData, evaluateObjectives],
   );
 
   // ── Submit chat message ───────────────────────────────────────────────────
@@ -264,8 +270,17 @@ const TopicChatPage = () => {
       : [];
 
     const save = topic ? { topicId: topic.id, userMessage: text } : undefined;
-    const aiResponse = await handleStream([...contextSeed, ...interestSeed, ...updatedMessages], save);
+    const aiResponse = await handleStream(
+      [...contextSeed, ...interestSeed, ...updatedMessages],
+      save,
+    );
     runEvaluate(updatedMessages, aiResponse);
+    if (aiResponse && topic) {
+      recordActivity({
+        type: "chat_message",
+        metadata: { topicId: topic.id, courseId },
+      });
+    }
   };
 
   // ── "Ask AI" shortcut from objectives panel ───────────────────────────────
@@ -276,7 +291,16 @@ const TopicChatPage = () => {
       await submit(`Please explain this concept in detail: "${objectiveText}"`);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [streaming, course, topic, messages, overview, topicName, handleStream, objectivesData]
+    [
+      streaming,
+      course,
+      topic,
+      messages,
+      overview,
+      topicName,
+      handleStream,
+      objectivesData,
+    ],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -334,7 +358,10 @@ const TopicChatPage = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div style={{ backgroundColor: "var(--bg)" }} className="h-screen overflow-hidden">
+    <div
+      style={{ backgroundColor: "var(--bg)" }}
+      className="h-screen overflow-hidden"
+    >
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -428,7 +455,11 @@ const TopicChatPage = () => {
             <div className="flex-1 overflow-y-auto px-4 lg:px-8 py-6 space-y-4">
               {historyQuery.isLoading && (
                 <div className="flex justify-center py-4">
-                  <Loader2 size={18} className="animate-spin" style={{ color: "var(--primary)", opacity: 0.4 }} />
+                  <Loader2
+                    size={18}
+                    className="animate-spin"
+                    style={{ color: "var(--primary)", opacity: 0.4 }}
+                  />
                 </div>
               )}
               {(overview || overviewStreaming) && (
@@ -448,7 +479,9 @@ const TopicChatPage = () => {
                   interests={interests}
                   disabled={streaming}
                   onReExplain={(interest) =>
-                    submit(`Re-explain that using a ${interest.toLowerCase()} analogy or real-world example.`)
+                    submit(
+                      `Re-explain that using a ${interest.toLowerCase()} analogy or real-world example.`,
+                    )
                   }
                 />
               ))}
@@ -470,7 +503,10 @@ const TopicChatPage = () => {
                   >
                     {streamingContent ? (
                       <div className="px-4 py-3">
-                        <MarkdownMessage content={streamingContent} isStreaming={true} />
+                        <MarkdownMessage
+                          content={streamingContent}
+                          isStreaming={true}
+                        />
                         <span
                           className="inline-block w-0.5 h-4 ml-0.5 animate-pulse align-middle"
                           style={{ backgroundColor: "var(--primary)" }}
@@ -537,11 +573,17 @@ const TopicChatPage = () => {
 
               {/* Interest switcher */}
               <div className="flex items-center gap-2 mt-3 flex-wrap">
-                <span className="text-xs shrink-0" style={{ color: "var(--text-secondary)" }}>
+                <span
+                  className="text-xs shrink-0"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   Explain through:
                 </span>
                 {interests.length === 0 ? (
-                  <span className="text-xs italic" style={{ color: "var(--text-secondary)", opacity: 0.5 }}>
+                  <span
+                    className="text-xs italic"
+                    style={{ color: "var(--text-secondary)", opacity: 0.5 }}
+                  >
                     No interests set
                   </span>
                 ) : (
@@ -550,10 +592,14 @@ const TopicChatPage = () => {
                     return (
                       <button
                         key={interest}
-                        onClick={() => setActiveInterest(active ? null : interest)}
+                        onClick={() =>
+                          setActiveInterest(active ? null : interest)
+                        }
                         className="text-xs font-semibold px-2.5 py-1 rounded-lg transition-all"
                         style={{
-                          backgroundColor: active ? course.color : "var(--secondary)",
+                          backgroundColor: active
+                            ? course.color
+                            : "var(--secondary)",
                           color: active ? "#fff" : "var(--text-secondary)",
                         }}
                       >
@@ -714,7 +760,10 @@ function ObjectivesPanel({
           className="px-4 py-3 border-t shrink-0"
           style={{ borderColor: "var(--border)" }}
         >
-          <p className="text-xs mb-3" style={{ color: "var(--text-secondary)" }}>
+          <p
+            className="text-xs mb-3"
+            style={{ color: "var(--text-secondary)" }}
+          >
             {coveredCount} of {objectives.length} covered
           </p>
           {!topicCompleted && (
@@ -754,7 +803,11 @@ function ObjectiveRow({
     <div className="group flex items-start gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors">
       <div className="mt-0.5 shrink-0">
         {isEvaluating && !objective.covered ? (
-          <Loader2 size={13} className="animate-spin" style={{ color: courseColor }} />
+          <Loader2
+            size={13}
+            className="animate-spin"
+            style={{ color: courseColor }}
+          />
         ) : objective.covered ? (
           <CheckCircle2 size={13} style={{ color: courseColor }} />
         ) : (
@@ -764,7 +817,9 @@ function ObjectiveRow({
       <span
         className="flex-1 text-xs leading-relaxed"
         style={{
-          color: objective.covered ? "var(--text-primary)" : "var(--text-secondary)",
+          color: objective.covered
+            ? "var(--text-primary)"
+            : "var(--text-secondary)",
         }}
       >
         {objective.text}
@@ -892,7 +947,10 @@ function ChatBubble({
               </button>
             ) : (
               <>
-                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                <span
+                  className="text-xs"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   Re-explain using:
                 </span>
                 {interests.map((interest) => (
