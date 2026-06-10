@@ -273,24 +273,34 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   {/* Course header */}
                   {preview && (
                     <>
-                      <div className="flex items-center gap-3 mb-3">
+                      {/* Course image / icon banner */}
+                      {preview.imageUrl ? (
+                        <div className="w-full h-32 rounded-xl overflow-hidden mb-3">
+                          <img
+                            src={preview.imageUrl}
+                            alt={courseName}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
                         <div
-                          className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
+                          className="w-full h-32 rounded-xl flex items-center justify-center text-4xl mb-3"
                           style={{ backgroundColor: `${preview.color}18` }}
                         >
                           {preview.icon}
                         </div>
-                        <div>
-                          <p
-                            className="font-bold text-base leading-snug"
-                            style={{ fontFamily: 'Archivo Black, sans-serif', color: 'var(--text-primary)' }}
-                          >
-                            {courseName}
-                          </p>
-                          <p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                            {preview.description}
-                          </p>
-                        </div>
+                      )}
+
+                      <div className="mb-3">
+                        <p
+                          className="font-bold text-base leading-snug"
+                          style={{ fontFamily: 'Archivo Black, sans-serif', color: 'var(--text-primary)' }}
+                        >
+                          {courseName}
+                        </p>
+                        <p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                          {preview.description}
+                        </p>
                       </div>
 
                       {/* Topic list */}

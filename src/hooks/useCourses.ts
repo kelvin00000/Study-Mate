@@ -6,6 +6,12 @@ import {
   postCreateCourse,
   postGenerateTopics,
   postCompleteTopic,
+  patchCourse,
+  deleteCourse,
+  postAddTopic,
+  patchTopic,
+  deleteTopic,
+  putReorderTopics,
   type CoursePreview,
 } from "../api/courses";
 
@@ -56,6 +62,91 @@ export function useCreateCourse() {
   });
 }
 
+export function useUpdateCourse(courseId: string) {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { title?: string; description?: string; icon?: string; color?: string }) => {
+      const token = await getToken();
+      return patchCourse(token!, courseId, data);
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["courses", courseId], data);
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+    },
+  });
+}
+
+export function useDeleteCourse() {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (courseId: string) => {
+      const token = await getToken();
+      return deleteCourse(token!, courseId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+    },
+  });
+}
+
+export function useAddTopic(courseId: string) {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (title: string) => {
+      const token = await getToken();
+      return postAddTopic(token!, courseId, title);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+    },
+  });
+}
+
+export function useUpdateTopic(courseId: string) {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ topicId, title }: { topicId: string; title: string }) => {
+      const token = await getToken();
+      return patchTopic(token!, courseId, topicId, title);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+    },
+  });
+}
+
+export function useDeleteTopic(courseId: string) {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (topicId: string) => {
+      const token = await getToken();
+      return deleteTopic(token!, courseId, topicId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+    },
+  });
+}
+
+export function useReorderTopics(courseId: string) {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (topicIds: string[]) => {
+      const token = await getToken();
+      return putReorderTopics(token!, courseId, topicIds);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+    },
+  });
+}
+
 export function useCompleteTopic(courseId: string) {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
@@ -67,6 +158,7 @@ export function useCompleteTopic(courseId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["streak"] });
     },
   });
 }

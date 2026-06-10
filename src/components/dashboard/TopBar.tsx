@@ -4,9 +4,11 @@ import { useUser } from '@clerk/clerk-react';
 interface TopBarProps {
   onCreateNew: () => void;
   onMenuToggle: () => void;
+  searchValue?: string;
+  onSearchChange?: (v: string) => void;
 }
 
-export function  TopBar({ onCreateNew, onMenuToggle }: TopBarProps) {
+export function  TopBar({ onCreateNew, onMenuToggle, searchValue, onSearchChange }: TopBarProps) {
     const { user } = useUser();
 
     return (
@@ -26,6 +28,8 @@ export function  TopBar({ onCreateNew, onMenuToggle }: TopBarProps) {
                     type="text"
                     placeholder="Search courses, topics..."
                     className="w-full pl-9 pr-4 py-2 text-sm text-black bg-[#F8FAFC] rounded-[25px] border-none focus:outline-none transition-colors"
+                    value={searchValue ?? ''}
+                    onChange={e => onSearchChange?.(e.target.value)}
                 />
             </div>
 

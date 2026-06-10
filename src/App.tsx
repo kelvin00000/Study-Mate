@@ -11,6 +11,7 @@ import {
 import HomePage from "./pages/HomePage";
 import CoursesPage from "./pages/CoursesPage";
 import CourseDetailPage from "./pages/CourseDetailPage";
+import EditCoursePage from "./pages/EditCoursePage";
 import TopicChatPage from "./pages/TopicChatPage";
 import TopicQuizPage from "./pages/TopicQuizPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -41,6 +42,7 @@ function App() {
           <Route path="/dashboard" element={<HomePage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
+          <Route path="/courses/:id/edit" element={<EditCoursePage />} />
           <Route path="/courses/:courseId/topics/:topicIndex" element={<TopicChatPage />} />
           <Route path="/courses/:courseId/topics/:topicIndex/quiz" element={<TopicQuizPage />} />
           <Route path="/settings" element={<SettingsPage />} />

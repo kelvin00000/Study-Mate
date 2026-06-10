@@ -33,6 +33,42 @@ export const postGenerateObjectives = (
     body: JSON.stringify(body),
   });
 
+export const postAddObjective = (
+  token: string,
+  courseId: string,
+  topicId: string,
+  text: string,
+): Promise<LearningObjective> =>
+  apiCall(`/courses/${courseId}/topics/${topicId}/objectives`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify({ text }),
+  });
+
+export const patchObjective = (
+  token: string,
+  courseId: string,
+  topicId: string,
+  objectiveId: string,
+  text: string,
+): Promise<LearningObjective> =>
+  apiCall(`/courses/${courseId}/topics/${topicId}/objectives/${objectiveId}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify({ text }),
+  });
+
+export const deleteObjective = (
+  token: string,
+  courseId: string,
+  topicId: string,
+  objectiveId: string,
+): Promise<{ success: boolean }> =>
+  apiCall(`/courses/${courseId}/topics/${topicId}/objectives/${objectiveId}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+
 export const postEvaluateObjectives = (
   token: string,
   courseId: string,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Lock, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Lock, CheckCircle2, ChevronRight, Loader2, Pencil } from 'lucide-react';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { TopBar } from '../components/dashboard/TopBar';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
@@ -67,13 +67,22 @@ const CourseDetailPage = () => {
                 className="rounded-2xl p-6 mb-6 border"
                 style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
               >
-                <div className="flex items-start gap-4 mb-5">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                    style={{ backgroundColor: `${course.color}18` }}
-                  >
-                    {course.icon}
-                  </div>
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-start gap-4 flex-1">
+                  {course.imageUrl ? (
+                    <img
+                      src={course.imageUrl}
+                      alt={course.title}
+                      className="w-14 h-14 rounded-2xl object-cover shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0"
+                      style={{ backgroundColor: `${course.color}18` }}
+                    >
+                      {course.icon}
+                    </div>
+                  )}
                   <div>
                     <h1
                       className="text-xl lg:text-2xl font-bold mb-1"
@@ -85,6 +94,15 @@ const CourseDetailPage = () => {
                       {course.description}
                     </p>
                   </div>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/courses/${id}/edit`)}
+                    className="shrink-0 p-2 rounded-xl border transition-colors hover:bg-[var(--secondary)]"
+                    style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+                    title="Edit course"
+                  >
+                    <Pencil size={16} />
+                  </button>
                 </div>
 
                 {/* Progress */}
