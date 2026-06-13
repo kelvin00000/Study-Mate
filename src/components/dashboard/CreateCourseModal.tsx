@@ -175,26 +175,20 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                 >
                   {/* Badge */}
                   <div className="flex justify-center mb-5">
-                    <span
-                      className="text-xs font-bold px-3 py-1 rounded-full text-white tracking-widest uppercase"
-                      style={{ backgroundColor: 'var(--primary)' }}
-                    >
+                    <span className="text-xs font-bold px-3 py-1 rounded-full text-white tracking-widest uppercase bg-deep-bluish">
                       AI Course Builder
                     </span>
                   </div>
 
-                  <h2
-                    className="text-2xl font-bold text-center mb-2"
-                    style={{ fontFamily: 'Archivo Black, sans-serif', color: 'var(--text-primary)' }}
-                  >
+                  <h2 className="text-2xl font-bold text-center mb-2 text-deep-bluish">
                     Design your path
                   </h2>
-                  <p className="text-sm text-center mb-6" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-sm text-center mb-6 text-moderate-green/70">
                     Enter a topic and let AI create a personalized learning roadmap for you.
                   </p>
 
                   <label className="block mb-1.5">
-                    <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                    <span className="text-sm font-medium text-deep-bluish">
                       Course name
                     </span>
                   </label>
@@ -205,16 +199,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                     onKeyDown={e => e.key === 'Enter' && handleGenerate()}
                     placeholder="e.g. Introduction to Machine Learning"
                     disabled={generating}
-                    className="w-full px-4 py-2.5 text-sm border rounded-xl mb-5 focus:outline-none transition-colors disabled:opacity-60"
-                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-                    onFocus={e => {
-                      e.currentTarget.style.borderColor = 'var(--primary)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(101,65,240,0.12)';
-                    }}
-                    onBlur={e => {
-                      e.currentTarget.style.borderColor = 'var(--border)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
+                    className="w-full px-4 py-2.5 text-sm border border-laurel-green/20 text-deep-bluish rounded-xl mb-5 focus:outline-none focus:border-moderate-green focus:shadow-[0_0_0_3px_rgba(39,97,82,0.12)] transition-colors disabled:opacity-60"
                     autoFocus
                   />
 
@@ -223,8 +208,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   <button
                     onClick={handleGenerate}
                     disabled={!courseName.trim() || generating}
-                    className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 mb-2"
-                    style={{ backgroundColor: 'var(--primary)' }}
+                    className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 mb-2 bg-deep-bluish"
                   >
                     {generating ? (
                       <>
@@ -242,10 +226,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   <button
                     onClick={onClose}
                     disabled={generating}
-                    className="w-full py-2.5 text-sm font-medium transition-colors disabled:opacity-40"
-                    style={{ color: 'var(--text-secondary)' }}
-                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-primary)')}
-                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)')}
+                    className="w-full py-2.5 text-sm font-medium transition-colors disabled:opacity-40 text-moderate-green/70 hover:text-deep-bluish"
                   >
                     Cancel
                   </button>
@@ -263,8 +244,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   <button
                     onClick={() => { setStep('input'); setError(''); }}
                     disabled={busy}
-                    className="flex items-center gap-1 text-sm font-medium mb-5 transition-opacity hover:opacity-70 disabled:opacity-40"
-                    style={{ color: 'var(--primary)' }}
+                    className="flex items-center gap-1 text-sm font-medium mb-5 transition-opacity hover:opacity-70 disabled:opacity-40 text-moderate-green"
                   >
                     <ArrowLeft size={14} />
                     Edit name
@@ -292,23 +272,17 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                       )}
 
                       <div className="mb-3">
-                        <p
-                          className="font-bold text-base leading-snug"
-                          style={{ fontFamily: 'Archivo Black, sans-serif', color: 'var(--text-primary)' }}
-                        >
+                        <p className="font-bold text-base leading-snug text-deep-bluish">
                           {courseName}
                         </p>
-                        <p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                        <p className="text-xs leading-relaxed mt-0.5 text-moderate-green/70">
                           {preview.description}
                         </p>
                       </div>
 
                       {/* Topic list */}
-                      <div
-                        className="rounded-xl border p-3 mb-4"
-                        style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg)' }}
-                      >
-                        <p className="text-xs font-semibold mb-2 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>
+                      <div className="rounded-xl border border-laurel-green/20 bg-light-cream p-3 mb-4">
+                        <p className="text-xs font-semibold mb-2 uppercase tracking-wide text-moderate-green/70">
                           {editableTopics.length} topics
                         </p>
                         <ol className="space-y-1 max-h-64 overflow-y-auto pr-0.5">
@@ -332,13 +306,11 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                                     if (e.key === 'Escape') { e.preventDefault(); setEditingIndex(null); }
                                   }}
                                   disabled={busy}
-                                  className="flex-1 min-w-0 text-sm px-2 py-0.5 border rounded-lg focus:outline-none"
-                                  style={{ borderColor: 'var(--primary)', color: 'var(--text-primary)', boxShadow: '0 0 0 2px rgba(101,65,240,0.12)' }}
+                                  className="flex-1 min-w-0 text-sm px-2 py-0.5 border border-moderate-green text-deep-bluish rounded-lg focus:outline-none shadow-[0_0_0_2px_rgba(39,97,82,0.12)]"
                                 />
                               ) : (
                                 <span
-                                  className="flex-1 min-w-0 text-sm truncate cursor-text"
-                                  style={{ color: 'var(--text-primary)' }}
+                                  className="flex-1 min-w-0 text-sm truncate cursor-text text-deep-bluish"
                                   onClick={() => { if (!busy) { setEditingIndex(i); setEditingValue(topic); } }}
                                   title="Click to edit"
                                 >
@@ -351,8 +323,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                                   <button
                                     onClick={() => { if (!busy) { setEditingIndex(i); setEditingValue(topic); } }}
                                     disabled={busy}
-                                    className="p-0.5 rounded transition-colors hover:text-purple-600 disabled:opacity-40"
-                                    style={{ color: 'var(--text-secondary)' }}
+                                    className="p-0.5 rounded transition-colors text-moderate-green/70 hover:text-moderate-green disabled:opacity-40"
                                     title="Rename"
                                   >
                                     <Pencil size={12} />
@@ -361,8 +332,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                                 <button
                                   onClick={() => moveTopic(i, -1)}
                                   disabled={busy || i === 0}
-                                  className="p-0.5 rounded transition-colors hover:text-purple-600 disabled:opacity-20"
-                                  style={{ color: 'var(--text-secondary)' }}
+                                  className="p-0.5 rounded transition-colors text-moderate-green/70 hover:text-moderate-green disabled:opacity-20"
                                   title="Move up"
                                 >
                                   <ChevronUp size={14} />
@@ -370,8 +340,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                                 <button
                                   onClick={() => moveTopic(i, 1)}
                                   disabled={busy || i === editableTopics.length - 1}
-                                  className="p-0.5 rounded transition-colors hover:text-purple-600 disabled:opacity-20"
-                                  style={{ color: 'var(--text-secondary)' }}
+                                  className="p-0.5 rounded transition-colors text-moderate-green/70 hover:text-moderate-green disabled:opacity-20"
                                   title="Move down"
                                 >
                                   <ChevronDown size={14} />
@@ -379,8 +348,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                                 <button
                                   onClick={() => deleteTopic(i)}
                                   disabled={busy || editableTopics.length <= 1}
-                                  className="p-0.5 rounded transition-colors hover:text-red-500 disabled:opacity-20"
-                                  style={{ color: 'var(--text-secondary)' }}
+                                  className="p-0.5 rounded transition-colors text-moderate-green/70 hover:text-red-500 disabled:opacity-20"
                                   title="Delete"
                                 >
                                   <Trash2 size={12} />
@@ -391,7 +359,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                         </ol>
 
                         {/* Add topic row */}
-                        <div className="flex items-center gap-1.5 mt-2 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
+                        <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-laurel-green/20">
                           <input
                             type="text"
                             value={newTopicInput}
@@ -399,16 +367,12 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTopic(); } }}
                             placeholder="Add a topic..."
                             disabled={busy}
-                            className="flex-1 min-w-0 text-sm px-2 py-1 border rounded-lg focus:outline-none transition-colors disabled:opacity-50"
-                            style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-                            onFocus={e => { e.currentTarget.style.borderColor = 'var(--primary)'; }}
-                            onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+                            className="flex-1 min-w-0 text-sm px-2 py-1 border border-laurel-green/20 text-deep-bluish rounded-lg focus:outline-none focus:border-moderate-green transition-colors disabled:opacity-50"
                           />
                           <button
                             onClick={addTopic}
                             disabled={busy || !newTopicInput.trim()}
-                            className="p-1.5 rounded-lg text-white transition-all disabled:opacity-40 hover:opacity-90"
-                            style={{ backgroundColor: 'var(--primary)' }}
+                            className="p-1.5 rounded-lg text-white transition-all disabled:opacity-40 hover:opacity-90 bg-deep-bluish"
                             title="Add topic"
                           >
                             <Plus size={14} />
@@ -423,8 +387,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   <button
                     onClick={handleCreate}
                     disabled={busy}
-                    className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 mb-2"
-                    style={{ backgroundColor: 'var(--primary)' }}
+                    className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 mb-2 bg-deep-bluish"
                   >
                     {creating ? (
                       <>
@@ -442,8 +405,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   <button
                     onClick={handleRegenerate}
                     disabled={busy}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-xl border transition-all disabled:opacity-40 hover:opacity-70"
-                    style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-xl border border-laurel-green/20 text-moderate-green/70 transition-all disabled:opacity-40 hover:opacity-70"
                   >
                     {generating ? (
                       <Loader2 size={14} className="animate-spin" />

@@ -11,6 +11,6 @@ export function useChatHistory(topicId: string | undefined) {
       return fetchChatHistory(token!, topicId!);
     },
     enabled: !!topicId,
-    gcTime: 0, // never cache across navigations — always fetch fresh on mount
+    staleTime: 0, // always refetch on mount, but show cached data instantly
   });
 }

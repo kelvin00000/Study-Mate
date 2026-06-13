@@ -19,7 +19,7 @@ export function StreakMilestoneToast({ milestone, onDismiss }: StreakMilestoneTo
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 40 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl text-white"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-60 flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl text-white"
       style={{
         background: "linear-gradient(135deg, #6063EE 0%, #8B5CF6 100%)",
         minWidth: 260,

@@ -67,7 +67,7 @@ export function CourseCard({
                         <span>{topicsCompleted}/{totalTopics} topics</span>
                         <span className="font-semibold" style={{ color }}>{progressPercent}%</span>
                     </div>
-                    <div className="h-2 bg-[#F3F0FF] rounded-full overflow-hidden">
+                    <div className="h-2 bg-laurel-green/15 rounded-full overflow-hidden">
                         <div
                             className="h-full rounded-full transition-all duration-700"
                             style={{ width: `${progressPercent}%`, backgroundColor: color }}

@@ -45,7 +45,7 @@ const CoursesPage = () => {
   ];
 
   return (
-    <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+    <div className="bg-light-cream min-h-screen">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -56,6 +56,7 @@ const CoursesPage = () => {
         <TopBar
           onCreateNew={() => setModalOpen(true)}
           onMenuToggle={() => setSidebarOpen(true)}
+          showSearch
           searchValue={search}
           onSearchChange={setSearch}
         />
@@ -64,20 +65,16 @@ const CoursesPage = () => {
           {/* Page header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1
-                className="text-2xl lg:text-3xl font-bold mb-1"
-                style={{ fontFamily: 'Archivo Black, sans-serif', color: 'var(--text-primary)' }}
-              >
+              <h1 className="text-2xl lg:text-3xl font-bold mb-1 text-deep-bluish">
                 My Courses
               </h1>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm text-moderate-green/70">
                 {isLoading ? '...' : `${counts.all} course${counts.all !== 1 ? 's' : ''} total`}
               </p>
             </div>
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: 'var(--primary)' }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
             >
               <Plus size={16} />
               New Course
@@ -92,21 +89,11 @@ const CoursesPage = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveFilter(tab.key)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                  style={
-                    isActive
-                      ? { backgroundColor: 'var(--primary)', color: '#fff' }
-                      : { backgroundColor: 'var(--secondary)', color: 'var(--text-secondary)' }
-                  }
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-moderate-green text-white' : 'bg-laurel-green/20 text-moderate-green/70'}`}
                 >
                   {tab.label}
                   <span
-                    className="text-xs px-1.5 py-0.5 rounded-md font-semibold"
-                    style={
-                      isActive
-                        ? { backgroundColor: 'rgba(255,255,255,0.25)', color: '#fff' }
-                        : { backgroundColor: 'var(--border)', color: 'var(--text-secondary)' }
-                    }
+                    className={`text-xs px-1.5 py-0.5 rounded-md font-semibold ${isActive ? 'bg-white/25 text-white' : 'bg-laurel-green/30 text-moderate-green/70'}`}
                   >
                     {counts[tab.key]}
                   </span>
@@ -121,13 +108,13 @@ const CoursesPage = () => {
               {[1, 2, 3].map(n => (
                 <div
                   key={n}
-                  className="rounded-2xl border p-5 animate-pulse"
-                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', minHeight: 180 }}
+                  className="rounded-2xl border border-laurel-green/20 bg-white p-5 animate-pulse"
+                  style={{ minHeight: 180 }}
                 >
-                  <div className="w-11 h-11 rounded-xl mb-4" style={{ backgroundColor: 'var(--secondary)' }} />
-                  <div className="h-4 rounded mb-2 w-3/4" style={{ backgroundColor: 'var(--secondary)' }} />
-                  <div className="h-3 rounded mb-1 w-full" style={{ backgroundColor: 'var(--secondary)' }} />
-                  <div className="h-3 rounded w-2/3" style={{ backgroundColor: 'var(--secondary)' }} />
+                  <div className="w-11 h-11 rounded-xl mb-4 bg-laurel-green/15" />
+                  <div className="h-4 rounded mb-2 w-3/4 bg-laurel-green/15" />
+                  <div className="h-3 rounded mb-1 w-full bg-laurel-green/15" />
+                  <div className="h-3 rounded w-2/3 bg-laurel-green/15" />
                 </div>
               ))}
             </div>
@@ -157,7 +144,7 @@ const CoursesPage = () => {
                 <div className="text-5xl mb-4">
                   {q ? '🔍' : activeFilter === 'all' ? '📭' : activeFilter === 'in-progress' ? '📖' : '🏆'}
                 </div>
-                <p className="text-base font-medium" style={{ color: 'var(--text-primary)' }}>
+                <p className="text-base font-medium text-deep-bluish">
                   {q
                     ? `No courses found for "${search.trim()}"`
                     : activeFilter === 'all'
@@ -166,7 +153,7 @@ const CoursesPage = () => {
                     ? 'No in-progress courses yet.'
                     : 'No completed courses yet.'}
                 </p>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-sm mt-1 text-moderate-green/70">
                   {q
                     ? 'Try a different search term or clear the search.'
                     : activeFilter === 'all'
@@ -178,8 +165,7 @@ const CoursesPage = () => {
                 {!q && activeFilter === 'all' && (
                   <button
                     onClick={() => setModalOpen(true)}
-                    className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: 'var(--primary)' }}
+                    className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
                   >
                     <Plus size={16} />
                     New Course

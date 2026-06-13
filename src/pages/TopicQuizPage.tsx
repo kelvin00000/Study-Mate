@@ -32,7 +32,7 @@ const TopicQuizPage = () => {
   // useCourse loads in parallel — only needed for result screen UI
   const { data: course } = useCourse(courseId);
   // Resolved color: use state immediately, fall back to loaded course data
-  const courseColor = stateColor || course?.color || "var(--primary)";
+  const courseColor = stateColor || course?.color || "#0D3A35";
 
   const { mutate: completeTopic, isPending: completing } = useCompleteTopic(courseId ?? "");
 
@@ -72,20 +72,13 @@ const TopicQuizPage = () => {
   // ── Generating screen ──────────────────────────────────────────────────────
   if (phase === "generating") {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
+      <div className="flex items-center justify-center min-h-screen bg-light-cream">
         <div className="text-center">
-          <Loader2
-            size={32}
-            className="animate-spin mx-auto mb-4"
-            style={{ color: "var(--primary)" }}
-          />
-          <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+          <Loader2 size={32} className="animate-spin mx-auto mb-4 text-moderate-green" />
+          <p className="text-sm font-medium text-moderate-green/70">
             Generating your quiz…
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--text-secondary)", opacity: 0.6 }}>
+          <p className="text-xs mt-1 text-moderate-green/70 opacity-60">
             This may take up to a minute
           </p>
         </div>
@@ -96,22 +89,18 @@ const TopicQuizPage = () => {
   // ── Error screen ───────────────────────────────────────────────────────────
   if (phase === "error") {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
+      <div className="flex items-center justify-center min-h-screen bg-light-cream">
         <div className="text-center max-w-xs px-4">
           <p className="text-3xl mb-4">⚠️</p>
-          <p className="text-base font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+          <p className="text-base font-semibold mb-1 text-deep-bluish">
             Quiz generation failed
           </p>
-          <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-sm mb-6 text-moderate-green/70">
             The AI took too long to respond. Please go back and try again.
           </p>
           <button
             onClick={() => navigate(`/courses/${courseId}/topics/${topicIndex}`)}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-            style={{ backgroundColor: "var(--primary)" }}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-deep-bluish"
           >
             ← Back to Topic
           </button>
@@ -144,12 +133,11 @@ const TopicQuizPage = () => {
     const progress = (currentQ / quiz.questions.length) * 100;
 
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "var(--bg)" }}>
+      <div className="min-h-screen bg-light-cream">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <button
             onClick={() => navigate(`/courses/${courseId}/topics/${topicIndex}`)}
-            className="flex items-center gap-1.5 text-sm font-medium mb-8 transition-opacity hover:opacity-70"
-            style={{ color: "var(--primary)" }}
+            className="flex items-center gap-1.5 text-sm font-medium mb-8 transition-opacity hover:opacity-70 text-moderate-green"
           >
             <ArrowLeft size={16} />
             Back to topic
@@ -158,14 +146,14 @@ const TopicQuizPage = () => {
           {/* Progress header */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+              <h1 className="text-lg font-bold text-deep-bluish">
                 Quiz — {topicTitle}
               </h1>
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              <span className="text-sm text-moderate-green/70">
                 Question {currentQ + 1} of {quiz.questions.length}
               </span>
             </div>
-            <div className="h-2 rounded-full" style={{ backgroundColor: "var(--secondary)" }}>
+            <div className="h-2 rounded-full bg-laurel-green/15">
               <div
                 className="h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%`, backgroundColor: courseColor }}
@@ -174,40 +162,33 @@ const TopicQuizPage = () => {
           </div>
 
           {/* Question card */}
-          <div
-            className="rounded-2xl border p-6 mb-5"
-            style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
-          >
+          <div className="rounded-2xl border border-laurel-green/20 bg-white p-6 mb-5">
             <div className="mb-5">
               <MarkdownMessage content={question.question} />
             </div>
 
             <div className="flex flex-col gap-3">
-              {question.options.map((option, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedAnswer(idx)}
-                  className="flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all"
-                  style={{
-                    borderColor: selectedAnswer === idx ? courseColor : "var(--border)",
-                    backgroundColor: selectedAnswer === idx ? `${courseColor}12` : "var(--bg)",
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  <div
-                    className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
-                    style={{
-                      borderColor: selectedAnswer === idx ? courseColor : "var(--border)",
-                      backgroundColor: selectedAnswer === idx ? courseColor : "transparent",
-                    }}
+              {question.options.map((option, idx) => {
+                const selected = selectedAnswer === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedAnswer(idx)}
+                    className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all text-deep-bluish ${selected ? '' : 'border-laurel-green/20 bg-light-cream'}`}
+                    style={selected ? { borderColor: courseColor, backgroundColor: `${courseColor}12` } : undefined}
                   >
-                    {selectedAnswer === idx && (
-                      <div className="w-2 h-2 rounded-full bg-white" />
-                    )}
-                  </div>
-                  <span className="text-sm"><MarkdownMessage content={option} /></span>
-                </button>
-              ))}
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${selected ? '' : 'border-laurel-green/20'}`}
+                      style={selected ? { borderColor: courseColor, backgroundColor: courseColor } : undefined}
+                    >
+                      {selected && (
+                        <div className="w-2 h-2 rounded-full bg-white" />
+                      )}
+                    </div>
+                    <span className="text-sm"><MarkdownMessage content={option} /></span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -241,27 +222,23 @@ const TopicQuizPage = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "var(--bg)" }}>
+    <div className="min-h-screen bg-light-cream">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate(`/courses/${courseId}/topics/${topicIndex}`)}
-          className="flex items-center gap-1.5 text-sm font-medium mb-8 transition-opacity hover:opacity-70"
-          style={{ color: "var(--primary)" }}
+          className="flex items-center gap-1.5 text-sm font-medium mb-8 transition-opacity hover:opacity-70 text-moderate-green"
         >
           <ArrowLeft size={16} />
           Back to topic
         </button>
 
         {/* Score card */}
-        <div
-          className="rounded-2xl border p-8 mb-6 text-center"
-          style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
-        >
+        <div className="rounded-2xl border border-laurel-green/20 bg-white p-8 mb-6 text-center">
           <div className="text-5xl mb-3">{passed ? "🎉" : "💪"}</div>
-          <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-2xl font-bold mb-2 text-deep-bluish">
             {passed ? "Great work!" : "Keep going!"}
           </h1>
-          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-sm text-moderate-green/70">
             You scored {score}/{quiz.questions.length} ({scorePercent}%)
             {!passed && ` — need ${PASS_THRESHOLD}/${quiz.questions.length} to pass`}
           </p>
@@ -275,42 +252,27 @@ const TopicQuizPage = () => {
               return (
                 <div
                   key={i}
-                  className="rounded-xl border p-4"
-                  style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
+                  className="rounded-xl border border-laurel-green/20 bg-white p-4"
                 >
                   <div className="flex items-start gap-2">
                     {isCorrect ? (
-                      <CheckCircle2
-                        size={16}
-                        className="shrink-0 mt-0.5"
-                        style={{ color: "#22c55e" }}
-                      />
+                      <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-green-500" />
                     ) : (
-                      <XCircle
-                        size={16}
-                        className="shrink-0 mt-0.5"
-                        style={{ color: "#ef4444" }}
-                      />
+                      <XCircle size={16} className="shrink-0 mt-0.5 text-red-500" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium mb-1" style={{ color: "var(--text-primary)" }}>
+                      <div className="text-sm font-medium mb-1 text-deep-bluish">
                         Q{i + 1} — <MarkdownMessage content={q.question} />
                       </div>
                       {!isCorrect && (
                         <div className="mt-2 space-y-1">
-                          <p className="text-xs" style={{ color: "#ef4444" }}>
+                          <p className="text-xs text-red-500">
                             Your answer: {q.options[answers[i] ?? 0]}
                           </p>
-                          <p className="text-xs" style={{ color: "#22c55e" }}>
+                          <p className="text-xs text-green-500">
                             Correct: {q.options[q.correctIndex]}
                           </p>
-                          <div
-                            className="text-xs mt-2 p-2.5 rounded-lg leading-relaxed"
-                            style={{
-                              backgroundColor: "var(--secondary)",
-                              color: "var(--text-secondary)",
-                            }}
-                          >
+                          <div className="text-xs mt-2 p-2.5 rounded-lg leading-relaxed bg-laurel-green/10 text-moderate-green/70">
                             <MarkdownMessage content={q.explanation} />
                           </div>
                         </div>
@@ -345,8 +307,7 @@ const TopicQuizPage = () => {
             <>
               <button
                 onClick={() => setShowExplanations((v) => !v)}
-                className="px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors hover:opacity-80"
-                style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-laurel-green/20 text-deep-bluish transition-colors hover:opacity-80"
               >
                 {showExplanations ? "Hide answers" : "Review answers"}
               </button>
@@ -356,8 +317,7 @@ const TopicQuizPage = () => {
                     state: { resetObjectives: true },
                   })
                 }
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white"
-                style={{ backgroundColor: "var(--primary)" }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-deep-bluish"
               >
                 ← Study More
               </button>

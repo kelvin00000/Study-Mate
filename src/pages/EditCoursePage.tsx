@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Loader2, ChevronDown, ChevronRight,
-  Trash2, Plus, Check, X,
+  Trash2, Plus, Check, X, Menu,
 } from 'lucide-react';
 import { Sidebar } from '../components/dashboard/Sidebar';
-import { TopBar } from '../components/dashboard/TopBar';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
 import { useCourse, useUpdateCourse, useDeleteCourse, useAddTopic, useUpdateTopic, useDeleteTopic, useReorderTopics } from '../hooks/useCourses';
 import { useObjectives, useAddObjective, useUpdateObjective, useDeleteObjective } from '../hooks/useObjectives';
@@ -49,7 +48,7 @@ function TopicObjectivesSection({ courseId, topicId }: { courseId: string; topic
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <Loader2 size={16} className="animate-spin" style={{ color: 'var(--primary)' }} />
+        <Loader2 size={16} className="animate-spin text-moderate-green" />
       </div>
     );
   }
@@ -58,17 +57,12 @@ function TopicObjectivesSection({ courseId, topicId }: { courseId: string; topic
     <div className="mt-3 pl-10 space-y-2">
       {(objectives ?? []).map((obj) => (
         <div key={obj.id} className="flex items-start gap-2 group">
-          <span className="mt-1 text-xs font-bold shrink-0" style={{ color: 'var(--text-secondary)' }}>•</span>
+          <span className="mt-1 text-xs font-bold shrink-0 text-moderate-green/70">•</span>
           {editingId === obj.id ? (
             <div className="flex flex-1 items-center gap-1">
               <input
                 autoFocus
-                className="flex-1 text-sm rounded-lg px-2 py-1 border outline-none"
-                style={{
-                  borderColor: 'var(--primary)',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--bg)',
-                }}
+                className="flex-1 text-sm rounded-lg px-2 py-1 border outline-none border-moderate-green text-deep-bluish bg-light-cream"
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
                 onBlur={() => commitEdit(obj.id)}
@@ -80,8 +74,7 @@ function TopicObjectivesSection({ courseId, topicId }: { courseId: string; topic
             </div>
           ) : (
             <span
-              className="flex-1 text-sm cursor-pointer hover:underline"
-              style={{ color: 'var(--text-primary)' }}
+              className="flex-1 text-sm cursor-pointer hover:underline text-deep-bluish"
               onClick={() => startEdit(obj)}
             >
               {obj.text}
@@ -99,14 +92,9 @@ function TopicObjectivesSection({ courseId, topicId }: { courseId: string; topic
 
       {/* Add objective row */}
       <div className="flex items-center gap-2 mt-2">
-        <Plus size={13} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+        <Plus size={13} className="text-moderate-green/70 shrink-0" />
         <input
-          className="flex-1 text-sm rounded-lg px-2 py-1 border outline-none"
-          style={{
-            borderColor: 'var(--border)',
-            color: 'var(--text-primary)',
-            backgroundColor: 'var(--bg)',
-          }}
+          className="flex-1 text-sm rounded-lg px-2 py-1 border outline-none border-laurel-green/20 text-deep-bluish bg-light-cream focus:border-moderate-green"
           placeholder="Add objective..."
           value={addText}
           onChange={(e) => setAddText(e.target.value)}
@@ -244,12 +232,16 @@ const EditCoursePage = () => {
 
   if (isLoading) {
     return (
-      <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      <div className="bg-light-cream min-h-screen">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewCourse={() => setModalOpen(true)} />
         <div className="lg:pl-60 flex flex-col min-h-screen">
-          <TopBar onCreateNew={() => setModalOpen(true)} onMenuToggle={() => setSidebarOpen(true)} />
+          <div className="lg:hidden flex items-center px-4 py-3">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+              <Menu size={20} />
+            </button>
+          </div>
           <div className="flex items-center justify-center py-24">
-            <Loader2 size={28} className="animate-spin" style={{ color: 'var(--primary)' }} />
+            <Loader2 size={28} className="animate-spin text-moderate-green" />
           </div>
         </div>
         <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
@@ -259,14 +251,18 @@ const EditCoursePage = () => {
 
   if (isError || !course) {
     return (
-      <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      <div className="bg-light-cream min-h-screen">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewCourse={() => setModalOpen(true)} />
         <div className="lg:pl-60 flex flex-col min-h-screen">
-          <TopBar onCreateNew={() => setModalOpen(true)} onMenuToggle={() => setSidebarOpen(true)} />
+          <div className="lg:hidden flex items-center px-4 py-3">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+              <Menu size={20} />
+            </button>
+          </div>
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="text-5xl mb-4">🔍</div>
-            <p className="text-base font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Course not found.</p>
-            <Link to="/courses" className="text-sm font-medium hover:opacity-70" style={{ color: 'var(--primary)' }}>
+            <p className="text-base font-medium mb-2 text-deep-bluish">Course not found.</p>
+            <Link to="/courses" className="text-sm font-medium hover:opacity-70 text-moderate-green">
               Back to My Courses
             </Link>
           </div>
@@ -277,52 +273,44 @@ const EditCoursePage = () => {
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+    <div className="bg-light-cream min-h-screen">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onNewCourse={() => setModalOpen(true)} />
 
       <div className="lg:pl-60 flex flex-col min-h-screen">
-        <TopBar onCreateNew={() => setModalOpen(true)} onMenuToggle={() => setSidebarOpen(true)} />
+        <div className="lg:hidden flex items-center px-4 py-3">
+          <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+            <Menu size={20} />
+          </button>
+        </div>
 
         <main className="flex-1 p-6 lg:p-8 max-w-3xl">
           {/* Back */}
           <button
             onClick={() => navigate(`/courses/${id}`)}
-            className="flex items-center gap-1.5 text-sm font-medium mb-6 transition-opacity hover:opacity-70"
-            style={{ color: 'var(--primary)' }}
+            className="flex items-center gap-1.5 text-sm font-medium mb-6 transition-opacity hover:opacity-70 text-moderate-green"
           >
             <ArrowLeft size={16} />
             Back to Course
           </button>
 
-          <h1
-            className="text-2xl font-bold mb-6"
-            style={{ fontFamily: 'Archivo Black, sans-serif', color: 'var(--text-primary)' }}
-          >
+          <h1 className="text-2xl font-bold mb-6 text-deep-bluish">
             Edit Course
           </h1>
 
           {/* ── Section 1: Course Info ── */}
-          <section
-            className="rounded-2xl border p-6 mb-6"
-            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
-          >
-            <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+          <section className="rounded-2xl border border-laurel-green/20 bg-white p-6 mb-6">
+            <h2 className="text-base font-semibold mb-4 text-deep-bluish">
               Course Info
             </h2>
 
             <div className="space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                <label className="block text-xs font-medium mb-1.5 text-moderate-green/70">
                   Title
                 </label>
                 <input
-                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none transition-colors focus:border-[var(--primary)]"
-                  style={{
-                    borderColor: 'var(--border)',
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--bg)',
-                  }}
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none transition-colors border-laurel-green/20 text-deep-bluish bg-light-cream focus:border-moderate-green"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
@@ -330,17 +318,12 @@ const EditCoursePage = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                <label className="block text-xs font-medium mb-1.5 text-moderate-green/70">
                   Description
                 </label>
                 <textarea
                   rows={3}
-                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none resize-none transition-colors focus:border-[var(--primary)]"
-                  style={{
-                    borderColor: 'var(--border)',
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--bg)',
-                  }}
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none resize-none transition-colors border-laurel-green/20 text-deep-bluish bg-light-cream focus:border-moderate-green"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -349,22 +332,18 @@ const EditCoursePage = () => {
               {/* Icon + Color row */}
               <div className="flex flex-wrap gap-6 items-end">
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  <label className="block text-xs font-medium mb-1.5 text-moderate-green/70">
                     Icon (emoji)
                   </label>
                   <input
-                    className="w-16 rounded-xl px-3 py-2.5 text-lg text-center border outline-none transition-colors focus:border-[var(--primary)]"
-                    style={{
-                      borderColor: 'var(--border)',
-                      backgroundColor: 'var(--bg)',
-                    }}
+                    className="w-16 rounded-xl px-3 py-2.5 text-lg text-center border outline-none transition-colors border-laurel-green/20 bg-light-cream focus:border-moderate-green"
                     value={icon}
                     maxLength={2}
                     onChange={(e) => setIcon(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  <label className="block text-xs font-medium mb-1.5 text-moderate-green/70">
                     Color
                   </label>
                   <div className="flex gap-2">
@@ -375,7 +354,7 @@ const EditCoursePage = () => {
                         className="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110"
                         style={{
                           backgroundColor: c,
-                          borderColor: color === c ? 'var(--text-primary)' : 'transparent',
+                          borderColor: color === c ? '#0D3A35' : 'transparent',
                         }}
                         title={c}
                       />
@@ -389,8 +368,7 @@ const EditCoursePage = () => {
               <button
                 onClick={handleSaveInfo}
                 disabled={updateCourse.isPending}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-60"
-                style={{ backgroundColor: 'var(--primary)' }}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-60 bg-deep-bluish"
               >
                 {updateCourse.isPending ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -406,12 +384,9 @@ const EditCoursePage = () => {
           </section>
 
           {/* ── Section 2: Topics ── */}
-          <section
-            className="rounded-2xl border p-6 mb-6"
-            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}
-          >
+          <section className="rounded-2xl border border-laurel-green/20 bg-white p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
+              <h2 className="text-base font-semibold text-deep-bluish">
                 Topics
               </h2>
             </div>
@@ -424,21 +399,18 @@ const EditCoursePage = () => {
                 return (
                   <div
                     key={topic.id}
-                    className="rounded-xl border overflow-hidden"
-                    style={{ borderColor: 'var(--border)' }}
+                    className="rounded-xl border border-laurel-green/20 overflow-hidden"
                   >
                     {/* Row header */}
                     <div
-                      className="flex items-center gap-2 px-3 py-2.5"
-                      style={{ backgroundColor: 'var(--bg)' }}
+                      className="flex items-center gap-2 px-3 py-2.5 bg-light-cream"
                     >
                       {/* Order buttons */}
                       <div className="flex flex-col gap-0.5 shrink-0">
                         <button
                           onClick={() => moveUp(index)}
                           disabled={index === 0}
-                          className="w-5 h-4 flex items-center justify-center rounded text-xs disabled:opacity-20 hover:bg-black/5"
-                          style={{ color: 'var(--text-secondary)' }}
+                          className="w-5 h-4 flex items-center justify-center rounded text-xs disabled:opacity-20 hover:bg-black/5 text-moderate-green/70"
                           title="Move up"
                         >
                           ▲
@@ -446,8 +418,7 @@ const EditCoursePage = () => {
                         <button
                           onClick={() => moveDown(index)}
                           disabled={index === localTopics.length - 1}
-                          className="w-5 h-4 flex items-center justify-center rounded text-xs disabled:opacity-20 hover:bg-black/5"
-                          style={{ color: 'var(--text-secondary)' }}
+                          className="w-5 h-4 flex items-center justify-center rounded text-xs disabled:opacity-20 hover:bg-black/5 text-moderate-green/70"
                           title="Move down"
                         >
                           ▼
@@ -466,12 +437,7 @@ const EditCoursePage = () => {
                       {isEditing ? (
                         <input
                           autoFocus
-                          className="flex-1 text-sm rounded-lg px-2 py-1 border outline-none"
-                          style={{
-                            borderColor: 'var(--primary)',
-                            color: 'var(--text-primary)',
-                            backgroundColor: 'var(--card)',
-                          }}
+                          className="flex-1 text-sm rounded-lg px-2 py-1 border outline-none border-moderate-green text-deep-bluish bg-white"
                           value={editingTopicTitle}
                           onChange={(e) => setEditingTopicTitle(e.target.value)}
                           onBlur={() => commitTopicEdit(topic.id)}
@@ -482,8 +448,7 @@ const EditCoursePage = () => {
                         />
                       ) : (
                         <span
-                          className="flex-1 text-sm font-medium cursor-pointer hover:underline"
-                          style={{ color: 'var(--text-primary)' }}
+                          className="flex-1 text-sm font-medium cursor-pointer hover:underline text-deep-bluish"
                           onClick={() => startEditTopic(topic)}
                           title="Click to rename"
                         >
@@ -498,8 +463,8 @@ const EditCoursePage = () => {
                         title="Show objectives"
                       >
                         {isExpanded
-                          ? <ChevronDown size={16} style={{ color: 'var(--text-secondary)' }} />
-                          : <ChevronRight size={16} style={{ color: 'var(--text-secondary)' }} />}
+                          ? <ChevronDown size={16} className="text-moderate-green/70" />
+                          : <ChevronRight size={16} className="text-moderate-green/70" />}
                       </button>
                       <button
                         onClick={() => handleDeleteTopic(topic.id)}
@@ -512,10 +477,7 @@ const EditCoursePage = () => {
 
                     {/* Objectives */}
                     {isExpanded && (
-                      <div
-                        className="px-3 pb-3"
-                        style={{ backgroundColor: 'var(--card)' }}
-                      >
+                      <div className="px-3 pb-3 bg-white">
                         <TopicObjectivesSection courseId={id!} topicId={topic.id} />
                       </div>
                     )}
@@ -527,12 +489,7 @@ const EditCoursePage = () => {
             {/* Add topic row */}
             <div className="flex items-center gap-2 mt-4">
               <input
-                className="flex-1 rounded-xl px-3 py-2.5 text-sm border outline-none transition-colors focus:border-[var(--primary)]"
-                style={{
-                  borderColor: 'var(--border)',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--bg)',
-                }}
+                className="flex-1 rounded-xl px-3 py-2.5 text-sm border outline-none transition-colors border-laurel-green/20 text-deep-bluish bg-light-cream focus:border-moderate-green"
                 placeholder="New topic title..."
                 value={newTopicTitle}
                 onChange={(e) => setNewTopicTitle(e.target.value)}
@@ -541,8 +498,7 @@ const EditCoursePage = () => {
               <button
                 onClick={handleAddTopic}
                 disabled={!newTopicTitle.trim() || addTopic.isPending}
-                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-50"
-                style={{ backgroundColor: 'var(--primary)' }}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-50 bg-deep-bluish"
               >
                 {addTopic.isPending ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 Add
@@ -551,14 +507,11 @@ const EditCoursePage = () => {
           </section>
 
           {/* ── Section 3: Danger Zone ── */}
-          <section
-            className="rounded-2xl border p-6"
-            style={{ borderColor: '#FCA5A5' }}
-          >
+          <section className="rounded-2xl border border-red-300 bg-white p-6">
             <h2 className="text-base font-semibold mb-1" style={{ color: '#DC2626' }}>
               Danger Zone
             </h2>
-            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-sm mb-4 text-moderate-green/70">
               Permanently deletes this course, all its topics, objectives, and your progress.
             </p>
 
@@ -571,17 +524,12 @@ const EditCoursePage = () => {
               </button>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                <p className="text-sm font-medium text-deep-bluish">
                   Type <strong>{course.title}</strong> to confirm deletion:
                 </p>
                 <input
                   autoFocus
-                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none transition-colors focus:border-red-400"
-                  style={{
-                    borderColor: 'var(--border)',
-                    color: 'var(--text-primary)',
-                    backgroundColor: 'var(--bg)',
-                  }}
+                  className="w-full rounded-xl px-3 py-2.5 text-sm border outline-none transition-colors border-laurel-green/20 text-deep-bluish bg-light-cream focus:border-red-400"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder={course.title}
@@ -597,8 +545,7 @@ const EditCoursePage = () => {
                   </button>
                   <button
                     onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold border transition-colors hover:bg-black/5"
-                    style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold border border-laurel-green/20 text-moderate-green/70 transition-colors hover:bg-black/5"
                   >
                     <X size={14} />
                     Cancel

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
@@ -9,10 +9,13 @@ import {
   Target,
   Circle,
   X,
+  Menu,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "motion/react";
 import { Sidebar } from "../components/dashboard/Sidebar";
-import { TopBar } from "../components/dashboard/TopBar";
 import { CreateCourseModal } from "../components/dashboard/CreateCourseModal";
 import { useCourse } from "../hooks/useCourses";
 import { useTopicChat, type Message } from "../hooks/useTopicChat";
@@ -27,25 +30,67 @@ import { useChatHistory } from "../hooks/useChatHistory";
 import { useUserPreferences } from "../hooks/useUserPreferences";
 import { useRecordActivity } from "../hooks/useStreak";
 import { MarkdownMessage } from "../components/MarkdownMessage";
+import { Colors as C } from "../constants/Color";
 
-// ── Typing indicator ───────────────────────────────────────────────────────
-const TypingDots = () => (
-  <div className="flex items-center gap-1 px-4 py-3">
+// ── Thinking indicator (gentle pulsing dots) ─────────────────────────────────
+const ThinkingIndicator = () => (
+  <div className="flex items-center gap-1.5 px-1 py-3">
     {[0, 1, 2].map((i) => (
       <span
         key={i}
-        className="w-2 h-2 rounded-full animate-bounce"
+        className="w-1.5 h-1.5 rounded-full thinking-dot"
         style={{
-          backgroundColor: "var(--primary)",
-          animationDelay: `${i * 0.15}s`,
-          opacity: 0.6,
+          backgroundColor: C.inkMuted,
+          animationDelay: `${i * 0.2}s`,
         }}
       />
     ))}
   </div>
 );
 
-// ── Main page ──────────────────────────────────────────────────────────────
+// ── Streaming bubble — splits stable vs in-progress text to avoid flicker ────
+const StreamingBubble = React.memo(({ content }: { content: string }) => {
+  // Split into completed blocks (double newline) vs the trailing partial line.
+  // Only the partial tail re-renders on each delta; completed blocks are stable markdown.
+  const { stable, tail } = useMemo(() => {
+    if (!content) return { stable: "", tail: "" };
+    const lastBreak = content.lastIndexOf("\n\n");
+    if (lastBreak === -1) return { stable: "", tail: content };
+    return {
+      stable: content.slice(0, lastBreak),
+      tail: content.slice(lastBreak + 2),
+    };
+  }, [content]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    >
+      {content ? (
+        <div style={{ color: C.ink }}>
+          {stable && (
+            <MarkdownMessage content={stable} isStreaming={true} />
+          )}
+          {tail && (
+            <div className="markdown-message text-sm leading-relaxed">
+              <p className="mb-2 last:mb-0 whitespace-pre-wrap">{tail}</p>
+            </div>
+          )}
+          <span
+            className="inline-block w-0.5 h-5 ml-0.5 align-middle rounded-full streaming-cursor"
+            style={{ backgroundColor: C.inkMid }}
+          />
+        </div>
+      ) : (
+        <ThinkingIndicator />
+      )}
+    </motion.div>
+  );
+});
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 const TopicChatPage = () => {
   const { courseId, topicIndex } = useParams<{
     courseId: string;
@@ -58,6 +103,7 @@ const TopicChatPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [showMobileObjectives, setShowMobileObjectives] = useState(false);
+  const [showObjectives, setShowObjectives] = useState(false);
   const [overview, setOverview] = useState<string>("");
   const [overviewStreaming, setOverviewStreaming] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -65,6 +111,7 @@ const TopicChatPage = () => {
   const [streaming, setStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [activeInterest, setActiveInterest] = useState<string | null>(null);
+  const [showInterests, setShowInterests] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -76,11 +123,10 @@ const TopicChatPage = () => {
   const topic = course?.topics.find((t) => t.order === topicIdx);
   const topicName = topic?.title ?? "";
 
-  // ── User interests for re-explain feature ────────────────────────────────
   const { data: preferences } = useUserPreferences();
   const interests = preferences?.interests ?? [];
 
-  // ── Chat history ─────────────────────────────────────────────────────────
+  // ── Chat history ──────────────────────────────────────────────────────────
   const historyQuery = useChatHistory(topic?.id);
   const historySeeded = useRef(false);
   useEffect(() => {
@@ -89,7 +135,13 @@ const TopicChatPage = () => {
     setMessages(historyQuery.data);
   }, [historyQuery.data]);
 
-  // ── Objectives hooks ─────────────────────────────────────────────────────
+  // Use cached data directly on first render (before seed effect commits)
+  const displayMessages =
+    !historySeeded.current && historyQuery.data?.length
+      ? historyQuery.data
+      : messages;
+
+  // ── Objectives hooks ──────────────────────────────────────────────────────
   const objectivesQuery = useObjectives(courseId, topic?.id);
   const generateObjectives = useGenerateObjectives(courseId, topic?.id);
   const evaluateObjectives = useEvaluateObjectives(courseId, topic?.id);
@@ -98,11 +150,10 @@ const TopicChatPage = () => {
   const coveredCount = objectivesData.filter((o) => o.covered).length;
   const allCovered =
     objectivesData.length > 0 && coveredCount === objectivesData.length;
-
   const objectivesLoading =
     objectivesQuery.isLoading || generateObjectives.isPending;
 
-  // ── Reset objectives when returning from a failed quiz ───────────────────
+  // ── Reset objectives on failed quiz return ────────────────────────────────
   const resetRef = useRef(false);
   useEffect(() => {
     if (!location.state?.resetObjectives || resetRef.current || !topic) return;
@@ -114,7 +165,7 @@ const TopicChatPage = () => {
     );
   }, [location.state?.resetObjectives, topic, courseId, queryClient]);
 
-  // ── Auto-generate objectives when none exist yet ─────────────────────────
+  // ── Auto-generate objectives ──────────────────────────────────────────────
   const objectivesGenRef = useRef(false);
   useEffect(() => {
     if (
@@ -134,15 +185,28 @@ const TopicChatPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objectivesQuery.isSuccess, objectivesQuery.data?.length, course, topic]);
 
+  const initialScrollDone = useRef(false);
+
+  // Snap to bottom BEFORE browser paints (no visible scroll)
+  useLayoutEffect(() => {
+    if (displayMessages.length > 0 && !initialScrollDone.current) {
+      initialScrollDone.current = true;
+      bottomRef.current?.scrollIntoView({ behavior: "instant" });
+    }
+  }, [displayMessages]);
+
+  // Smooth-scroll for new messages / streaming after initial load
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
+    if (initialScrollDone.current) {
+      scrollToBottom();
+    }
   }, [messages, streamingContent, scrollToBottom]);
 
-  // ── handleStream: returns full AI text on completion ─────────────────────
+  // ── handleStream ──────────────────────────────────────────────────────────
   const handleStream = useCallback(
     async (
       history: Message[],
@@ -151,7 +215,6 @@ const TopicChatPage = () => {
       if (!course || !topicName) return "";
       setStreaming(true);
       setStreamingContent("");
-
       return new Promise<string>((resolve) => {
         sendMessage(
           history,
@@ -185,39 +248,43 @@ const TopicChatPage = () => {
     [course, topicName, sendMessage],
   );
 
-  // ── Overview seed (runs once on mount) ───────────────────────────────────
+  // ── Overview seed ─────────────────────────────────────────────────────────
+  // Read cached overview synchronously during render (localStorage is sync)
   const seededRef = useRef(false);
+  if (course && topic && !seededRef.current) {
+    const cached = getOverview(course.id, topic.id);
+    if (cached) {
+      seededRef.current = true;
+      if (!overview) setOverview(cached);
+    }
+  }
+
+  // Stream overview only when not in localStorage (first visit)
   useEffect(() => {
     if (!course || !topicName || !topic || seededRef.current) return;
     seededRef.current = true;
-
-    const cached = getOverview(course.id, topic.id);
-    if (cached) {
-      setOverview(cached);
-    } else {
-      setOverviewStreaming(true);
-      const prompt: Message = {
-        role: "user",
-        content: `Give a welcoming introduction to "${topicName}" as part of the "${course.title}" course. Explain what it is, why it matters, and the key concepts we'll explore together. Keep it encouraging and under 200 words.`,
-      };
-      let accumulated = "";
-      sendMessage(
-        [prompt],
-        course.title,
-        topicName,
-        (delta) => {
-          accumulated += delta;
-          setOverview(accumulated);
-        },
-        (fullText) => {
-          setOverview(fullText);
-          setOverviewStreaming(false);
-        },
-      ).catch(() => setOverviewStreaming(false));
-    }
+    setOverviewStreaming(true);
+    const prompt: Message = {
+      role: "user",
+      content: `Give a welcoming introduction to "${topicName}" as part of the "${course.title}" course. Explain what it is, why it matters, and the key concepts we'll explore together. Keep it encouraging and under 200 words.`,
+    };
+    let accumulated = "";
+    sendMessage(
+      [prompt],
+      course.title,
+      topicName,
+      (delta) => {
+        accumulated += delta;
+        setOverview(accumulated);
+      },
+      (fullText) => {
+        setOverview(fullText);
+        setOverviewStreaming(false);
+      },
+    ).catch(() => setOverviewStreaming(false));
   }, [course, topicName, topic, sendMessage]);
 
-  // ── Evaluate objectives after AI response ────────────────────────────────
+  // ── Evaluate objectives ───────────────────────────────────────────────────
   const runEvaluate = useCallback(
     (updatedMessages: Message[], aiResponse: string) => {
       if (!aiResponse || objectivesData.length === 0) return;
@@ -232,16 +299,14 @@ const TopicChatPage = () => {
     [objectivesData, evaluateObjectives],
   );
 
-  // ── Submit chat message ───────────────────────────────────────────────────
+  // ── Submit ────────────────────────────────────────────────────────────────
   const submit = async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();
     if (!text || streaming || !course) return;
-
     if (!overrideText) {
       setInput("");
       if (textareaRef.current) textareaRef.current.style.height = "auto";
     }
-
     const userMsg: Message = { role: "user", content: text };
     const updatedMessages = [...messages, userMsg];
     setMessages(updatedMessages);
@@ -283,7 +348,6 @@ const TopicChatPage = () => {
     }
   };
 
-  // ── "Ask AI" shortcut from objectives panel ───────────────────────────────
   const askAboutObjective = useCallback(
     async (objectiveText: string) => {
       if (streaming || !course) return;
@@ -329,29 +393,18 @@ const TopicChatPage = () => {
     });
   };
 
-  // ── Loading / error states ────────────────────────────────────────────────
+  // ── Loading / error ───────────────────────────────────────────────────────
   if (courseLoading) {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
-        <Loader2
-          size={28}
-          className="animate-spin"
-          style={{ color: "var(--primary)" }}
-        />
+      <div className="flex items-center justify-center min-h-screen bg-light-cream">
+        <Loader2 size={24} className="animate-spin text-moderate-green" />
       </div>
     );
   }
-
   if (!course || !topic) {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
-        <p style={{ color: "var(--text-secondary)" }}>Topic not found.</p>
+      <div className="flex items-center justify-center min-h-screen bg-light-cream">
+        <p className="text-laurel-green">Topic not found.</p>
       </div>
     );
   }
@@ -359,7 +412,7 @@ const TopicChatPage = () => {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div
-      style={{ backgroundColor: "var(--bg)" }}
+      style={{ backgroundColor: C.pageBg }}
       className="h-screen overflow-hidden"
     >
       <Sidebar
@@ -369,384 +422,441 @@ const TopicChatPage = () => {
       />
 
       <div className="lg:pl-60 flex flex-col h-full">
-        <TopBar
-          onCreateNew={() => setModalOpen(true)}
-          onMenuToggle={() => setSidebarOpen(true)}
-        />
-
         <main className="flex-1 flex overflow-hidden min-h-0">
-          {/* ── Left: chat column ── */}
-          <div className="flex-1 flex flex-col overflow-hidden min-w-0 min-h-0">
-            {/* Header */}
-            <div
-              className="px-6 lg:px-8 py-4 border-b flex items-center justify-between gap-3 shrink-0"
-              style={{
-                backgroundColor: "var(--card)",
-                borderColor: "var(--border)",
-              }}
-            >
-              <div className="flex items-center gap-3 min-w-0">
+          {/* ── Chat column ── */}
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0 min-h-0 relative">
+            {/* Header — glassmorphism overlay, content scrolls behind */}
+            <div className="absolute top-0 left-0 right-0 z-10 px-4 lg:px-6 py-3 bg-light-cream/80 backdrop-blur-md lg:bg-transparent lg:backdrop-blur-none">
+              {/* Mobile: left-aligned row */}
+              <div className="flex lg:hidden items-center gap-3">
                 <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="p-1.5 rounded-lg transition-colors hover:bg-black/5 shrink-0"
+                  style={{ color: C.inkMid }}
+                >
+                  <Menu size={18} />
+                </button>
+                <button
+                  className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-md"
+                  style={{
+                    backgroundColor: C.cardBg,
+                    border: `1px solid ${C.border}`,
+                  }}
                   onClick={() => navigate(`/courses/${courseId}`)}
-                  className="flex items-center gap-1.5 text-sm font-medium transition-opacity hover:opacity-70 shrink-0"
-                  style={{ color: "var(--primary)" }}
                 >
-                  <ArrowLeft size={16} />
-                  Back
+                  <ArrowLeft size={16} style={{ color: C.inkMid }} />
                 </button>
-                <div
-                  className="w-px h-5 shrink-0"
-                  style={{ backgroundColor: "var(--border)" }}
-                />
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-lg shrink-0" style={{ lineHeight: 1 }}>
-                    {course.icon}
-                  </span>
-                  <div className="min-w-0">
-                    <p
-                      className="text-xs font-medium truncate"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {course.title}
-                    </p>
-                    <p
-                      className="text-sm font-semibold truncate"
-                      style={{ color: "var(--text-primary)" }}
-                    >
-                      {topicName}
-                    </p>
-                  </div>
-                </div>
+                <div className="flex-1" />
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                {/* Mobile: objectives count chip */}
-                {!objectivesLoading && objectivesData.length > 0 && (
-                  <button
-                    onClick={() => setShowMobileObjectives(true)}
-                    className="lg:hidden flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg"
-                    style={{
-                      backgroundColor: "var(--secondary)",
-                      color: "var(--primary)",
-                    }}
-                  >
-                    <Target size={12} />
-                    {coveredCount}/{objectivesData.length}
-                  </button>
-                )}
-
-                {/* Completed badge */}
-                {topic.completed && (
-                  <div
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg"
-                    style={{
-                      backgroundColor: `${course.color}18`,
-                      color: course.color,
-                    }}
-                  >
-                    <CheckCircle2 size={14} />
-                    Completed
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Message list */}
-            <div className="flex-1 overflow-y-auto px-4 lg:px-8 py-6 space-y-4">
-              {historyQuery.isLoading && (
-                <div className="flex justify-center py-4">
-                  <Loader2
-                    size={18}
-                    className="animate-spin"
-                    style={{ color: "var(--primary)", opacity: 0.4 }}
-                  />
-                </div>
-              )}
-              {(overview || overviewStreaming) && (
-                <OverviewCard
-                  content={overview}
-                  streaming={overviewStreaming}
-                  courseColor={course.color}
-                  topicName={topicName}
-                />
-              )}
-
-              {messages.map((msg, i) => (
-                <ChatBubble
-                  key={i}
-                  message={msg}
-                  courseColor={course.color}
-                  interests={interests}
-                  disabled={streaming}
-                  onReExplain={(interest) =>
-                    submit(
-                      `Re-explain that using a ${interest.toLowerCase()} analogy or real-world example.`,
-                    )
-                  }
-                />
-              ))}
-
-              {streaming && (
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
-                    style={{ backgroundColor: `${course.color}20` }}
-                  >
-                    {course.icon}
-                  </div>
-                  <div
-                    className="rounded-2xl rounded-tl-sm max-w-[75%] lg:max-w-[60%]"
-                    style={{
-                      backgroundColor: "var(--card)",
-                      border: "1px solid var(--border)",
-                    }}
-                  >
-                    {streamingContent ? (
-                      <div className="px-4 py-3">
-                        <MarkdownMessage
-                          content={streamingContent}
-                          isStreaming={true}
-                        />
-                        <span
-                          className="inline-block w-0.5 h-4 ml-0.5 animate-pulse align-middle"
-                          style={{ backgroundColor: "var(--primary)" }}
-                        />
-                      </div>
-                    ) : (
-                      <TypingDots />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div ref={bottomRef} />
-            </div>
-
-            {/* Input bar */}
-            <div
-              className="px-4 lg:px-8 py-4 border-t shrink-0"
-              style={{
-                backgroundColor: "var(--card)",
-                borderColor: "var(--border)",
-              }}
-            >
-              <div
-                className="flex items-end gap-3 rounded-2xl border px-4 py-3"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--bg)",
-                }}
-              >
-                <textarea
-                  ref={textareaRef}
-                  rows={1}
-                  value={input}
-                  onChange={handleTextareaChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask a question..."
-                  disabled={streaming}
-                  className="flex-1 resize-none bg-transparent text-sm outline-none leading-relaxed"
-                  style={{
-                    color: "var(--text-primary)",
-                    minHeight: "24px",
-                    maxHeight: "160px",
-                  }}
-                />
+              {/* Desktop: back button on left, course title on right */}
+              <div className="hidden lg:flex items-center justify-between">
                 <button
-                  onClick={() => submit()}
-                  disabled={!input.trim() || streaming}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-opacity"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 cursor-pointer shadow-md"
                   style={{
-                    backgroundColor: "var(--primary)",
-                    opacity: !input.trim() || streaming ? 0.4 : 1,
+                    backgroundColor: C.cardBg,
+                    border: `1px solid ${C.border}`,
                   }}
+                  onClick={() => navigate(`/courses/${courseId}`)}
                 >
-                  <Send size={14} color="white" />
+                  <ArrowLeft size={18} style={{ color: C.inkMid }} />
                 </button>
               </div>
-              <p
-                className="text-xs text-center mt-2"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Press Enter to send, Shift+Enter for new line
-              </p>
+            </div>
 
-              {/* Interest switcher */}
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                <span
-                  className="text-xs shrink-0"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  Explain through:
-                </span>
-                {interests.length === 0 ? (
-                  <span
-                    className="text-xs italic"
-                    style={{ color: "var(--text-secondary)", opacity: 0.5 }}
-                  >
-                    No interests set
-                  </span>
-                ) : (
-                  interests.map((interest) => {
-                    const active = activeInterest === interest;
-                    return (
-                      <button
-                        key={interest}
-                        onClick={() =>
-                          setActiveInterest(active ? null : interest)
-                        }
-                        className="text-xs font-semibold px-2.5 py-1 rounded-lg transition-all"
-                        style={{
-                          backgroundColor: active
-                            ? course.color
-                            : "var(--secondary)",
-                          color: active ? "#fff" : "var(--text-secondary)",
-                        }}
-                      >
-                        {interest}
-                      </button>
-                    );
-                  })
+            {/* Message list — centered column, pt accounts for floating header */}
+            <div
+              className="flex-1 overflow-y-auto pt-16 pb-8"
+              style={{ backgroundColor: C.pageBg }}
+            >
+              <div className="max-w-3xl mx-auto w-full px-4 lg:px-8 space-y-6">
+                {historyQuery.isLoading && (
+                  <div className="flex justify-center py-4">
+                    <Loader2
+                      size={18}
+                      className="animate-spin"
+                      style={{ color: C.inkMuted }}
+                    />
+                  </div>
                 )}
+
+                {(overview || overviewStreaming) && (
+                  <OverviewCard
+                    content={overview}
+                    streaming={overviewStreaming}
+                  />
+                )}
+
+                {displayMessages.map((msg, i) => (
+                  <ChatBubble
+                    key={i}
+                    message={msg}
+                    courseColor={course.color}
+                    interests={interests}
+                    disabled={streaming}
+                    onReExplain={(interest) =>
+                      submit(
+                        `Re-explain that using a ${interest.toLowerCase()} analogy or real-world example.`,
+                      )
+                    }
+                  />
+                ))}
+
+                {/* Streaming bubble — borderless, no avatar */}
+                {streaming && (
+                  <StreamingBubble content={streamingContent} />
+                )}
+                <div
+                  ref={bottomRef}
+                  style={{ height: streaming ? "40vh" : 0 }}
+                  className="transition-[height] duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Mobile floating objectives pill */}
+            {!objectivesLoading && objectivesData.length > 0 && !showMobileObjectives && (
+              <div className="lg:hidden flex justify-center pb-2 shrink-0">
+                <motion.button
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5, type: "spring", damping: 20 }}
+                  onClick={() => setShowMobileObjectives(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold shadow-lg cursor-pointer"
+                  style={{ backgroundColor: C.accentFill, color: "#FBF6F0" }}
+                >
+                  <Target size={13} />
+                  {coveredCount}/{objectivesData.length} Objectives
+                  <ChevronRight size={12} className="-ml-0.5" />
+                </motion.button>
+              </div>
+            )}
+
+            {/* Interest picker — expands upward above input */}
+            <AnimatePresence>
+              {showInterests && interests.length > 0 && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                  className="overflow-hidden shrink-0 px-4 lg:px-8"
+                  style={{ backgroundColor: C.pageBg }}
+                >
+                  <div className="max-w-3xl mx-auto w-full pb-2">
+                    <div
+                      className="rounded-2xl border px-4 py-3"
+                      style={{ borderColor: C.border, backgroundColor: C.cardBg }}
+                    >
+                      <p className="text-xs font-semibold mb-2" style={{ color: C.inkMid }}>
+                        Explain using analogy from…
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {interests.map((interest, i) => {
+                          const active = activeInterest === interest;
+                          return (
+                            <motion.button
+                              key={interest}
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2, delay: i * 0.04, ease: "easeInOut" }}
+                              onClick={() => {
+                                setActiveInterest(active ? null : interest);
+                                setShowInterests(false);
+                              }}
+                              className="text-xs font-semibold px-3 py-1.5 rounded-full transition-all cursor-pointer"
+                              style={{
+                                backgroundColor: active ? C.accentFillMid : C.chipInactive,
+                                color: active ? "#FBF6F0" : C.inkMid,
+                              }}
+                            >
+                              {interest}
+                            </motion.button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Interest pill + Input bar */}
+            <div
+              className="px-4 lg:px-8 py-3 shrink-0"
+              style={{ backgroundColor: C.pageBg }}
+            >
+              <div className="max-w-3xl mx-auto w-full flex flex-col gap-2">
+                {/* Interest floating pill */}
+                {interests.length > 0 && !showInterests && (
+                  <div className="flex justify-center">
+                    <motion.button
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.3, type: "spring", damping: 20 }}
+                      onClick={() => setShowInterests(true)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold shadow-lg cursor-pointer"
+                      style={{
+                        backgroundColor: activeInterest ? C.accentFillMid : C.accentFill,
+                        color: "#FBF6F0",
+                      }}
+                    >
+                      <Sparkles size={13} />
+                      {activeInterest ?? "Interest Lens"}
+                      <ChevronRight size={12} className="-ml-0.5 -rotate-90" />
+                    </motion.button>
+                  </div>
+                )}
+
+                {/* Input box */}
+                <div
+                  className="rounded-2xl border px-4 py-3"
+                  style={{ borderColor: C.border, backgroundColor: C.cardBg }}
+                >
+                  <textarea
+                    ref={textareaRef}
+                    rows={1}
+                    value={input}
+                    onChange={handleTextareaChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask a question..."
+                    disabled={streaming}
+                    className="w-full resize-none bg-transparent text-sm outline-none leading-relaxed"
+                    style={{
+                      color: C.ink,
+                      minHeight: "24px",
+                      maxHeight: "160px",
+                    }}
+                  />
+                  <div className="flex items-center mt-2">
+                    <div className="flex-1" />
+                    <button
+                      onClick={() => submit()}
+                      disabled={!input.trim() || streaming}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-opacity"
+                      style={{
+                        backgroundColor: C.accentFill,
+                        opacity: !input.trim() || streaming ? 0.3 : 1,
+                      }}
+                    >
+                      <Send size={14} color="#FBF6F0" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* ── Right: Objectives panel (desktop) ── */}
-          <ObjectivesPanel
-            objectives={objectivesData}
-            isLoading={objectivesLoading}
-            isEvaluating={evaluateObjectives.isPending}
-            allCovered={allCovered}
-            courseColor={course.color}
-            topicCompleted={topic.completed}
-            onAskAbout={askAboutObjective}
-            onTakeQuiz={handleTakeQuiz}
-            className="hidden lg:flex"
-          />
+          {/* ── Objectives panel (desktop) ── */}
+          <AnimatePresence mode="wait">
+            {showObjectives && (
+              <motion.div
+                key="objectives-panel"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 288, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="hidden lg:block shrink-0 overflow-hidden"
+              >
+                <ObjectivesPanel
+                  objectives={objectivesData}
+                  isLoading={objectivesLoading}
+                  isEvaluating={evaluateObjectives.isPending}
+                  allCovered={allCovered}
+                  topicCompleted={topic.completed}
+                  onAskAbout={askAboutObjective}
+                  onTakeQuiz={handleTakeQuiz}
+                  onCollapse={() => setShowObjectives(false)}
+                  className="flex h-full"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Floating objectives pill (desktop, when panel hidden) */}
+          <AnimatePresence>
+            {!showObjectives &&
+              !objectivesLoading &&
+              objectivesData.length > 0 && (
+                <motion.button
+                  key="objectives-pill"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  onClick={() => setShowObjectives(true)}
+                  className="hidden lg:flex fixed bottom-6 right-6 items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold shadow-lg hover:scale-105 z-30 cursor-pointer"
+                  style={{ backgroundColor: C.accentFill, color: "#FBF6F0" }}
+                >
+                  <Target size={14} />
+                  {coveredCount}/{objectivesData.length} Objectives
+                </motion.button>
+              )}
+          </AnimatePresence>
         </main>
       </div>
 
-      {/* Mobile objectives overlay */}
-      {showMobileObjectives && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowMobileObjectives(false)}
-          />
-          <div className="absolute right-0 top-0 h-full w-80 shadow-xl">
-            <ObjectivesPanel
-              objectives={objectivesData}
-              isLoading={objectivesLoading}
-              isEvaluating={evaluateObjectives.isPending}
-              allCovered={allCovered}
-              courseColor={course.color}
-              topicCompleted={topic.completed}
-              onAskAbout={(text) => {
-                setShowMobileObjectives(false);
-                askAboutObjective(text);
-              }}
-              onTakeQuiz={() => {
-                setShowMobileObjectives(false);
-                handleTakeQuiz();
-              }}
-              onClose={() => setShowMobileObjectives(false)}
-              className="flex h-full"
+      {/* Mobile objectives bottom sheet */}
+      <AnimatePresence>
+        {showMobileObjectives && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-black/30"
+              onClick={() => setShowMobileObjectives(false)}
             />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.1}
+              onDragEnd={(_, info) => {
+                if (info.offset.y > 100 || info.velocity.y > 500) {
+                  setShowMobileObjectives(false);
+                }
+              }}
+              className="absolute bottom-0 left-0 right-0 rounded-t-2xl overflow-hidden shadow-2xl"
+              style={{ maxHeight: "85vh", backgroundColor: C.pageBg }}
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing">
+                <div className="w-10 h-1 rounded-full bg-[rgba(177,183,171,0.4)]" />
+              </div>
+              <ObjectivesPanel
+                objectives={objectivesData}
+                isLoading={objectivesLoading}
+                isEvaluating={evaluateObjectives.isPending}
+                allCovered={allCovered}
+                topicCompleted={topic.completed}
+                onAskAbout={(text) => {
+                  setShowMobileObjectives(false);
+                  askAboutObjective(text);
+                }}
+                onTakeQuiz={() => {
+                  setShowMobileObjectives(false);
+                  handleTakeQuiz();
+                }}
+                onClose={() => setShowMobileObjectives(false)}
+                className="flex"
+                isBottomSheet
+              />
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };
 
-// ── ObjectivesPanel ────────────────────────────────────────────────────────
+
+
+// ── ObjectivesPanel ───────────────────────────────────────────────────────────
 function ObjectivesPanel({
   objectives,
   isLoading,
   isEvaluating,
   allCovered,
-  courseColor,
   topicCompleted,
   onAskAbout,
   onTakeQuiz,
   onClose,
+  onCollapse,
   className = "",
+  isBottomSheet = false,
 }: {
   objectives: LearningObjective[];
   isLoading: boolean;
   isEvaluating: boolean;
   allCovered: boolean;
-  courseColor: string;
   topicCompleted: boolean;
   onAskAbout: (text: string) => void;
   onTakeQuiz: () => void;
   onClose?: () => void;
+  onCollapse?: () => void;
   className?: string;
+  isBottomSheet?: boolean;
 }) {
   const coveredCount = objectives.filter((o) => o.covered).length;
 
   return (
     <div
-      className={`w-72 shrink-0 border-l flex-col ${className}`}
-      style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
+      className={`${isBottomSheet ? "w-full" : "w-72"} shrink-0 flex-col bg-light-cream ${isBottomSheet ? "" : "border border-gray-200"} ${className}`}
+      style={{
+        boxShadow: isBottomSheet ? "none" : "-4px 0 12px rgba(0,0,0,0.04)",
+        maxHeight: isBottomSheet ? "calc(85vh - 20px)" : undefined,
+      }}
     >
       {/* Panel header */}
       <div
         className="px-4 py-4 border-b shrink-0"
-        style={{ borderColor: "var(--border)" }}
+        style={{ borderColor: C.border }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target size={14} style={{ color: "var(--primary)" }} />
-            <span
-              className="text-sm font-semibold"
-              style={{ color: "var(--text-primary)" }}
-            >
+            <div
+              className="w-1 h-4 rounded-full shrink-0"
+              style={{ backgroundColor: C.inkMid }}
+            />
+            <Target size={13} style={{ color: C.inkMid }} />
+            <span className="text-sm font-semibold" style={{ color: C.ink }}>
               Learning Objectives
             </span>
           </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="transition-opacity hover:opacity-60"
-              style={{ color: "var(--text-secondary)" }}
+              className="transition-opacity hover:opacity-50"
+              style={{ color: C.inkMid }}
             >
-              <X size={16} />
+              <X size={16} color={C.inkMid} />
+            </button>
+          )}
+          {onCollapse && !onClose && (
+            <button
+              onClick={onCollapse}
+              className="transition-opacity hover:opacity-50"
+              style={{ color: C.inkMuted }}
+            >
+              <ChevronRight size={16} color={C.inkMid} />
             </button>
           )}
         </div>
       </div>
 
       {/* Objectives list */}
-      <div className="flex-1 overflow-y-auto px-3 py-3">
+      <div className="flex-1 overflow-y-auto px-3 py-4">
         {isLoading ? (
-          <div className="flex flex-col gap-2 px-1">
+          <div className="flex flex-col gap-2.5 px-1">
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="h-8 rounded-lg animate-pulse"
-                style={{ backgroundColor: "var(--secondary)" }}
+                className="h-10 rounded-xl animate-pulse"
+                style={{ backgroundColor: C.pageBg }}
               />
             ))}
           </div>
         ) : objectives.length === 0 ? (
-          <p
-            className="text-xs text-center py-6"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            No objectives yet.
-          </p>
+          <div className="flex flex-col items-center justify-center py-10 gap-2">
+            <Target size={20} style={{ color: C.inkMuted, opacity: 0.4 }} />
+            <p className="text-xs" style={{ color: C.inkMuted }}>
+              No objectives yet
+            </p>
+          </div>
         ) : (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             {objectives.map((obj) => (
               <ObjectiveRow
                 key={obj.id}
                 objective={obj}
                 isEvaluating={isEvaluating}
-                courseColor={courseColor}
                 onAskAbout={onAskAbout}
               />
             ))}
@@ -754,31 +864,61 @@ function ObjectivesPanel({
         )}
       </div>
 
-      {/* Footer: count + quiz button */}
+      {/* Footer */}
       {!isLoading && objectives.length > 0 && (
-        <div
-          className="px-4 py-3 border-t shrink-0"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <p
-            className="text-xs mb-3"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {coveredCount} of {objectives.length} covered
-          </p>
+        <div className="px-4 py-4 shrink-0">
+          {/* Completed badge */}
+          {topicCompleted && (
+            <div
+              className="flex items-center justify-center gap-2 text-xs font-semibold px-3 py-2 rounded-xl mb-3"
+              style={{ backgroundColor: C.accentFillLight, color: C.inkMid }}
+            >
+              <CheckCircle2 size={14} />
+              Completed
+            </div>
+          )}
+
+          {/* Progress */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] uppercase tracking-wide font-medium" style={{ color: C.inkMuted }}>
+                Progress
+              </span>
+              <span
+                className="text-xs font-bold"
+                style={{ color: C.inkMid }}
+              >
+                {coveredCount}/{objectives.length}
+              </span>
+            </div>
+            <div
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ backgroundColor: "rgba(177,183,171,0.2)" }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${objectives.length > 0 ? (coveredCount / objectives.length) * 100 : 0}%`,
+                  backgroundColor: C.inkMid,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Quiz button */}
           {!topicCompleted && (
             <button
               onClick={onTakeQuiz}
               disabled={!allCovered}
-              className="w-full text-sm font-semibold py-2 rounded-xl transition-opacity"
+              className="w-full text-sm font-semibold py-2.5 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed"
               style={{
-                backgroundColor: allCovered ? courseColor : "var(--secondary)",
-                color: allCovered ? "#fff" : "var(--text-secondary)",
-                opacity: allCovered ? 1 : 0.6,
+                backgroundColor: allCovered ? C.accentFill : C.chipInactive,
+                color: allCovered ? "#FBF6F0" : C.inkMuted,
+                opacity: allCovered ? 1 : 0.5,
                 cursor: allCovered ? "pointer" : "not-allowed",
               }}
             >
-              Take Quiz →
+              Take Quiz
             </button>
           )}
         </div>
@@ -787,105 +927,94 @@ function ObjectivesPanel({
   );
 }
 
-// ── ObjectiveRow ───────────────────────────────────────────────────────────
+// ── ObjectiveRow ──────────────────────────────────────────────────────────────
 function ObjectiveRow({
   objective,
   isEvaluating,
-  courseColor,
   onAskAbout,
 }: {
   objective: LearningObjective;
   isEvaluating: boolean;
-  courseColor: string;
   onAskAbout: (text: string) => void;
 }) {
+  const covered = objective.covered;
+
   return (
-    <div className="group flex items-start gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+    <button
+      className={`group flex items-start gap-3 px-3 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
+        covered
+          ? "bg-[rgba(39,97,82,0.08)]"
+          : "hover:bg-[rgba(39,97,82,0.04)]"
+      }`}
+      onClick={() => !covered && onAskAbout(objective.text)}
+      disabled={covered}
+    >
       <div className="mt-0.5 shrink-0">
-        {isEvaluating && !objective.covered ? (
+        {isEvaluating && !covered ? (
           <Loader2
-            size={13}
+            size={14}
             className="animate-spin"
-            style={{ color: courseColor }}
+            style={{ color: C.inkMid }}
           />
-        ) : objective.covered ? (
-          <CheckCircle2 size={13} style={{ color: courseColor }} />
+        ) : covered ? (
+          <CheckCircle2 size={14} style={{ color: C.inkMid }} />
         ) : (
-          <Circle size={13} style={{ color: "var(--border)" }} />
+          <Circle size={14} style={{ color: C.inkMuted, opacity: 0.5 }} />
         )}
       </div>
       <span
-        className="flex-1 text-xs leading-relaxed"
-        style={{
-          color: objective.covered
-            ? "var(--text-primary)"
-            : "var(--text-secondary)",
-        }}
+        className={`flex-1 text-xs leading-relaxed ${covered ? "line-through opacity-60" : ""}`}
+        style={{ color: covered ? C.inkMid : C.ink }}
       >
         {objective.text}
       </span>
-      {!objective.covered && !isEvaluating && (
-        <button
-          onClick={() => onAskAbout(objective.text)}
-          className="opacity-0 group-hover:opacity-100 text-xs font-semibold transition-opacity shrink-0 whitespace-nowrap"
-          style={{ color: courseColor }}
+      {!covered && !isEvaluating && (
+        <span
+          className="opacity-0 group-hover:opacity-100 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md transition-all shrink-0"
+          style={{ backgroundColor: C.accentFillLight, color: C.inkMid }}
         >
-          Ask AI →
-        </button>
+          Ask
+        </span>
       )}
-    </div>
+    </button>
   );
 }
 
-// ── OverviewCard ───────────────────────────────────────────────────────────
+// ── OverviewCard ──────────────────────────────────────────────────────────────
 function OverviewCard({
   content,
   streaming,
-  courseColor,
-  topicName,
 }: {
   content: string;
   streaming: boolean;
-  courseColor: string;
-  topicName: string;
 }) {
   return (
     <div
-      className="rounded-2xl border p-5"
-      style={{
-        backgroundColor: `${courseColor}08`,
-        borderColor: `${courseColor}30`,
-      }}
+      className="rounded-xl p-5"
+      style={{ backgroundColor: C.accentFillLight }}
     >
       <div className="flex items-center gap-2 mb-3">
-        <div
-          className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-          style={{ backgroundColor: `${courseColor}20` }}
-        >
-          <BookOpen size={13} style={{ color: courseColor }} />
-        </div>
-        <span
-          className="text-xs font-bold uppercase tracking-widest"
-          style={{ color: courseColor }}
-        >
-          Overview — {topicName}
+        <BookOpen size={13} style={{ color: C.inkMid }} />
+        <span className="text-xs font-semibold" style={{ color: C.inkMid }}>
+          Topic Overview
         </span>
       </div>
-      <MarkdownMessage content={content} />
+      <div style={{ color: C.ink }}>
+        <MarkdownMessage content={content} />
+      </div>
       {streaming && (
         <span
           className="inline-block w-0.5 h-4 ml-0.5 animate-pulse align-middle"
-          style={{ backgroundColor: courseColor }}
+          style={{ backgroundColor: C.inkMid }}
         />
       )}
     </div>
   );
 }
 
-// ── ChatBubble ─────────────────────────────────────────────────────────────
+// ── ChatBubble ────────────────────────────────────────────────────────────────
 function ChatBubble({
   message,
-  courseColor,
   interests = [],
   disabled = false,
   onReExplain,
@@ -902,8 +1031,8 @@ function ChatBubble({
     return (
       <div className="flex justify-end">
         <div
-          className="rounded-2xl rounded-tr-sm px-4 py-3 max-w-[75%] lg:max-w-[60%] text-sm leading-relaxed whitespace-pre-wrap"
-          style={{ backgroundColor: courseColor, color: "#fff" }}
+          className="rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm leading-relaxed whitespace-pre-wrap"
+          style={{ backgroundColor: C.accentFill, color: "#FBF6F0" }}
         >
           {message.content}
         </div>
@@ -914,75 +1043,75 @@ function ChatBubble({
   const showReExplain = interests.length > 0 && !!onReExplain;
 
   return (
-    <div className="flex items-start gap-3">
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
-        style={{ backgroundColor: `${courseColor}20` }}
-      >
-        AI
+    <div className="flex flex-col gap-1.5">
+      {/* AI message — borderless, no avatar, directly on page background */}
+      <div style={{ color: C.ink }}>
+        <MarkdownMessage content={message.content} />
       </div>
-      <div className="flex flex-col gap-1.5 max-w-[75%] lg:max-w-[60%]">
-        <div
-          className="rounded-2xl rounded-tl-sm px-4 py-3"
-          style={{
-            backgroundColor: "var(--card)",
-            border: "1px solid var(--border)",
-            color: "var(--text-primary)",
-          }}
-        >
-          <MarkdownMessage content={message.content} />
-        </div>
 
-        {/* Re-explain row */}
-        {showReExplain && (
-          <div className="flex flex-wrap items-center gap-1.5 px-1">
-            {!expanded ? (
-              <button
-                onClick={() => setExpanded(true)}
-                disabled={disabled}
-                className="text-xs font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
-                style={{ color: "var(--text-secondary)" }}
+      {/* Re-explain row */}
+      {showReExplain && (
+        <div className="flex flex-col gap-2 mt-1">
+          <div>
+            <button
+              onClick={() => setExpanded(!expanded)}
+              disabled={disabled}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all disabled:opacity-40"
+              style={{
+                backgroundColor: expanded ? C.accentFillMid : C.chipInactive,
+                color: expanded ? "#FBF6F0" : C.inkMid,
+              }}
+            >
+              Re-explain using…
+              <motion.span
+                animate={{ rotate: expanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="inline-flex"
               >
-                Re-explain using… ↓
-              </button>
-            ) : (
-              <>
-                <span
-                  className="text-xs"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  Re-explain using:
-                </span>
-                {interests.map((interest) => (
-                  <button
-                    key={interest}
-                    onClick={() => {
-                      setExpanded(false);
-                      onReExplain(interest);
-                    }}
-                    disabled={disabled}
-                    className="text-xs font-semibold px-2.5 py-1 rounded-lg transition-all hover:opacity-90 disabled:opacity-40"
-                    style={{
-                      backgroundColor: `${courseColor}15`,
-                      color: courseColor,
-                      border: `1px solid ${courseColor}30`,
-                    }}
-                  >
-                    {interest}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setExpanded(false)}
-                  className="text-xs transition-opacity hover:opacity-60"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  ✕
-                </button>
-              </>
-            )}
+                <ChevronRight size={12} className="rotate-90" />
+              </motion.span>
+            </button>
           </div>
-        )}
-      </div>
+
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="flex flex-wrap items-center gap-2 pb-1">
+                  {interests.map((interest, i) => (
+                    <motion.button
+                      key={interest}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
+                      transition={{ duration: 0.25, delay: 0.1 + i * 0.06, ease: "easeInOut" }}
+                      onClick={() => {
+                        setExpanded(false);
+                        onReExplain(interest);
+                      }}
+                      disabled={disabled}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-full disabled:opacity-40 cursor-pointer"
+                      style={{
+                        backgroundColor: C.accentFillLight,
+                        color: C.inkMid,
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {interest}
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }
