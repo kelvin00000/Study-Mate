@@ -24,7 +24,7 @@ export function DailyStreak({ onMilestone }: DailyStreakProps) {
   const xpPercent = Math.min(100, Math.round((dailyXp / dailyXpGoal) * 100));
 
   return (
-    <div className="rounded-2xl p-5 text-white shrink-0 lg:w-[30%] bg-[#6063EE]">
+    <div className="rounded-2xl p-5 text-white shrink-0 lg:w-[30%] bg-moderate-green">
       {!streak ? (
         /* Loading skeleton */
         <div className="flex flex-col gap-3">

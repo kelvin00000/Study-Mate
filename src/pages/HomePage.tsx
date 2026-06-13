@@ -23,7 +23,7 @@ const HomePage = () => {
   const recentCourses = courses.slice(0, 3);
 
   return (
-    <div className="flex h-screen font-normal bg-[#F8F9FF] overflow-hidden">
+    <div className="flex h-screen font-normal bg-light-cream overflow-hidden">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -40,7 +40,7 @@ const HomePage = () => {
           {/* Welcome + Streak */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8 h-[40%]">
             <div className='self-center mt-10 lg:mt-0 lg:w-[60%]'>
-              <h1 className="text-2xl lg:text-3xl mb-1 font-semibold">
+              <h1 className="text-2xl lg:text-3xl text-deep-bluish mb-1 font-semibold">
                 Welcome back, {user?.firstName ?? 'Learner'}.
               </h1>
               <p className="text-sm text-muted">
@@ -52,8 +52,7 @@ const HomePage = () => {
               </p>
               <button
                 onClick={() => setLeaderboardOpen(true)}
-                className="mt-3 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-opacity hover:opacity-80"
-                style={{ backgroundColor: 'var(--secondary)', color: 'var(--primary)' }}
+                className="mt-3 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-opacity hover:opacity-80 bg-moderate-green/10 hover:cursor-pointer text-moderate-green"
               >
                 <Trophy size={13} />
                 Leaderboard
@@ -66,15 +65,13 @@ const HomePage = () => {
           <section className="mt-10 lg:mt-0 mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2
-                className="text-base font-semibold"
-                style={{ color: 'var(--text-primary)' }}
+                className="text-base font-semibold text-deep-bluish"
               >
                 Your Courses
               </h2>
               <Link
                 to="/courses"
-                className="flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70"
-                style={{ color: 'var(--primary)' }}
+                className="flex items-center gap-1 text-sm font-medium transition-opacity hover:opacity-70 text-moderate-green"
               >
                 View all <ArrowRight size={14} />
               </Link>
@@ -118,7 +115,7 @@ const HomePage = () => {
                 </p>
                 <button
                   onClick={() => setModalOpen(true)}
-                  className="text-sm font-semibold px-4 py-2 rounded-xl text-white bg-[#6063EE] transition-opacity hover:opacity-90"
+                  className="text-sm font-semibold px-4 py-2 rounded-xl text-white bg-deep-bluish transition-opacity hover:opacity-90"
                 >
                   Create Course
                 </button>
@@ -128,11 +125,11 @@ const HomePage = () => {
 
           {/* Featured recommendation */}
           <section>
-            <h2 className="text-[#6063EE] font-semibold mb-4">
+            <h2 className="text-moderate-green font-semibold mb-4">
               Recommended For You
             </h2>
             <div
-              className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_15px_25px_rgba(0,0,0,0.1)] rounded-[20px]"
+              className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white shadow-lg shadow-moderate-green/20 rounded-[20px]"
             >
               <div>
                 <div className="flex items-center gap-2 mb-2 opacity-80">
@@ -143,7 +140,6 @@ const HomePage = () => {
                 </div>
                 <h3
                   className="text-xl font-bold mb-1"
-                  style={{ fontFamily: 'Archivo Black, sans-serif' }}
                 >
                   Data Structures & Algorithms
                 </h3>
@@ -153,7 +149,7 @@ const HomePage = () => {
               </div>
               <button
                 onClick={() => setModalOpen(true)}
-                className="shrink-0 px-5 py-2.5 bg-[#6063EE] text-sm text-[#FEFEFF] font-semibold rounded-xl transition-all cursor-pointer"
+                className="shrink-0 px-5 py-2.5 bg-moderate-green text-sm text-[#FEFEFF] font-semibold rounded-xl transition-all cursor-pointer"
               >
                 Start Learning
               </button>

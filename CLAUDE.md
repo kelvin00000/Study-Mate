@@ -44,6 +44,8 @@ VITE_API_BASE_URL=...           # Backend base URL, e.g. http://localhost:3000
 /courses/:id              CourseDetailPage
 /courses/:courseId/topics/:topicIndex          TopicChatPage
 /courses/:courseId/topics/:topicIndex/quiz     TopicQuizPage
+/courses/:id/edit                              EditCoursePage
+/settings                                      SettingsPage
 ```
 
 Route guards in `src/components/RouteGuards.tsx`:

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check } from 'lucide-react';
+import { Check, Menu } from 'lucide-react';
 import { Sidebar } from '../components/dashboard/Sidebar';
-import { TopBar } from '../components/dashboard/TopBar';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
 import { useUserPreferences } from '../hooks/useUserPreferences';
 import { useSubmitPreference } from '../hooks/useSubmitPreference';
@@ -90,7 +89,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="flex h-screen font-normal bg-[#F8F9FF] overflow-hidden">
+    <div className="flex h-screen font-normal bg-light-cream overflow-hidden">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -98,26 +97,28 @@ const SettingsPage = () => {
       />
 
       <div className="flex flex-col flex-1 overflow-hidden lg:ml-60">
-        <TopBar
-          onCreateNew={() => setModalOpen(true)}
-          onMenuToggle={() => setSidebarOpen(true)}
-        />
+        {/* Mobile hamburger */}
+        <div className="lg:hidden flex items-center px-4 py-3 bg-light-cream">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
 
         <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+            <h1 className="text-2xl font-semibold mb-1 text-deep-bluish">
               Settings
             </h1>
-            <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-sm mb-8 text-moderate-green/70">
               Manage your profile and learning preferences.
             </p>
 
             {/* Profile */}
-            <section
-              className="bg-white rounded-2xl p-6 mb-6 border"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+            <section className="bg-white rounded-2xl p-6 mb-6 border border-laurel-green/20">
+              <h2 className="text-base font-semibold mb-4 text-deep-bluish">
                 Profile
               </h2>
               <div className="flex items-center gap-4">
@@ -127,10 +128,10 @@ const SettingsPage = () => {
                   className="w-14 h-14 rounded-full object-cover"
                 />
                 <div>
-                  <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                  <p className="font-semibold text-sm text-deep-bluish">
                     {user?.fullName}
                   </p>
-                  <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-sm mt-0.5 text-moderate-green/70">
                     {user?.primaryEmailAddress?.emailAddress}
                   </p>
                 </div>
@@ -138,11 +139,8 @@ const SettingsPage = () => {
             </section>
 
             {/* Learning Preferences */}
-            <section
-              className="bg-white rounded-2xl p-6 mb-6 border"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              <h2 className="text-base font-semibold mb-5" style={{ color: 'var(--text-primary)' }}>
+            <section className="bg-white rounded-2xl p-6 mb-6 border border-laurel-green/20">
+              <h2 className="text-base font-semibold mb-5 text-deep-bluish">
                 Learning Preferences
               </h2>
 
@@ -165,7 +163,7 @@ const SettingsPage = () => {
                     const step = onboardingSteps[stepIdx];
                     return (
                       <div key={stepIdx}>
-                        <p className="text-sm font-medium mb-2.5" style={{ color: 'var(--text-secondary)' }}>
+                        <p className="text-sm font-medium mb-2.5 text-moderate-green/70">
                           {step.highlight.replace('?', '')}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -179,13 +177,9 @@ const SettingsPage = () => {
                                 }
                                 className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
                                   active
-                                    ? 'text-white border-transparent'
-                                    : 'text-[var(--text-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
+                                    ? 'text-white border-transparent bg-moderate-green'
+                                    : 'text-moderate-green/70 border-laurel-green/20 hover:border-moderate-green hover:text-moderate-green'
                                 }`}
-                                style={{
-                                  borderColor: active ? 'var(--primary)' : 'var(--border)',
-                                  backgroundColor: active ? 'var(--primary)' : undefined,
-                                }}
                               >
                                 {opt.title}
                               </button>
@@ -200,14 +194,11 @@ const SettingsPage = () => {
             </section>
 
             {/* Interests */}
-            <section
-              className="bg-white rounded-2xl p-6 mb-8 border"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+            <section className="bg-white rounded-2xl p-6 mb-8 border border-laurel-green/20">
+              <h2 className="text-base font-semibold mb-1 text-deep-bluish">
                 Interests
               </h2>
-              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mb-4 text-moderate-green/70">
                 Select topics you're passionate about.
               </p>
 
@@ -218,13 +209,11 @@ const SettingsPage = () => {
                   value={newInterest}
                   onChange={e => setNewInterest(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') addCustomInterest(); }}
-                  className="flex-1 border rounded-xl px-3 py-2 text-sm outline-none focus:border-[var(--primary)] transition-colors"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                  className="flex-1 border border-laurel-green/20 rounded-xl px-3 py-2 text-sm outline-none focus:border-moderate-green text-deep-bluish transition-colors"
                 />
                 <button
                   onClick={addCustomInterest}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: 'var(--primary)' }}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
                 >
                   Add
                 </button>
@@ -245,13 +234,9 @@ const SettingsPage = () => {
                       }
                       className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
                         selected
-                          ? 'text-white border-transparent'
-                          : 'text-[var(--text-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
+                          ? 'text-white border-transparent bg-moderate-green'
+                          : 'text-moderate-green/70 border-laurel-green/20 hover:border-moderate-green hover:text-moderate-green'
                       }`}
-                      style={{
-                        borderColor: selected ? 'var(--primary)' : 'var(--border)',
-                        backgroundColor: selected ? 'var(--primary)' : undefined,
-                      }}
                     >
                       {interest}
                     </button>
@@ -270,8 +255,7 @@ const SettingsPage = () => {
               <button
                 onClick={handleSave}
                 disabled={isPending || isLoading}
-                className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: 'var(--primary)' }}
+                className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 bg-deep-bluish"
               >
                 {isPending ? 'Saving...' : 'Save Changes'}
               </button>

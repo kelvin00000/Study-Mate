@@ -11,7 +11,7 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime:5000 * 60, // 5 minutes
+      staleTime:20000 * 60, // 5 minutes
       refetchOnWindowFocus: false,
     },
   },
