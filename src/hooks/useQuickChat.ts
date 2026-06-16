@@ -74,8 +74,7 @@ export function useQuickChatStream() {
     onDone: (fullText: string) => void
   ): Promise<void> => {
     const token = await getToken();
-    const baseUrl ='http://localhost:5000/api';
-    //  import.meta.env.VITE_API_BASE_URL as string;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL as string;
 
     const response = await fetch(
       `${baseUrl}/quick-chat/conversations/${conversationId}/chat`,
