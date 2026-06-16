@@ -1,17 +1,20 @@
+import { useState } from "react";
 import { UserButton } from "@clerk/clerk-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   BookOpen,
-  Library,
+  MessageCircle,
   Trophy,
   Plus,
   HelpCircle,
   X,
   Settings,
+  ChevronDown,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
+import { useConversations } from "../../hooks/useQuickChat";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -22,7 +25,7 @@ interface SidebarProps {
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { label: "My Courses", icon: BookOpen, href: "/courses" },
-  { label: "AI Library", icon: Library, href: "/library" },
+  { label: "Quick Chat", icon: MessageCircle, href: "/quick-chat" },
   { label: "Achievements", icon: Trophy, href: "/achievements" },
 ];
 
@@ -34,6 +37,9 @@ function SidebarContent({
   onNewCourse: () => void;
 }) {
   const location = useLocation();
+  const { data: conversations } = useConversations();
+  const [recentChatsOpen, setRecentChatsOpen] = useState(true);
+  const recentChats = (conversations ?? []).slice(0, 5);
 
   return (
     <div className="flex flex-col h-full bg-light-cream border-l shadow">
@@ -43,9 +49,9 @@ function SidebarContent({
       </div>
 
       {/* Nav items */}
-      <nav className="flex-1 px-3 py-2 space-y-0.5">
+      <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
         {navItems.map(({ label, icon: Icon, href }) => {
-          const active = location.pathname === href;
+          const active = location.pathname === href || (href === "/quick-chat" && location.pathname.startsWith("/quick-chat"));
           return (
             <Link
               key={href}
@@ -62,6 +68,37 @@ function SidebarContent({
             </Link>
           );
         })}
+
+        {/* Recent Chats */}
+        {recentChats.length > 0 && (
+          <div className="mt-4">
+            <button
+              onClick={() => setRecentChatsOpen(!recentChatsOpen)}
+              className="flex items-center gap-2 px-3 py-1.5 w-full text-xs font-semibold uppercase tracking-wide text-moderate-green/60 hover:text-moderate-green transition-colors"
+            >
+              <ChevronDown
+                size={12}
+                className={`transition-transform ${recentChatsOpen ? "" : "-rotate-90"}`}
+              />
+              Recent Chats
+            </button>
+            {recentChatsOpen && (
+              <div className="mt-1 space-y-0.5">
+                {recentChats.map((chat) => (
+                  <Link
+                    key={chat.id}
+                    to={`/quick-chat?c=${chat.id}`}
+                    onClick={onClose}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-moderate-green/80 hover:bg-gray-100 transition-all truncate"
+                  >
+                    <MessageCircle size={13} className="shrink-0 opacity-50" />
+                    <span className="truncate">{chat.title}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* Bottom section */}

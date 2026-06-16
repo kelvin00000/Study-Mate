@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Loader2, ChevronDown, ChevronRight,
@@ -135,6 +135,9 @@ const EditCoursePage = () => {
   const [editingTopicTitle, setEditingTopicTitle] = useState('');
   const [newTopicTitle, setNewTopicTitle] = useState('');
 
+  // Ref to skip topic sync after reorder (prevents useEffect from reverting optimistic state)
+  const skipTopicSync = useRef(false);
+
   // Danger zone
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -146,7 +149,11 @@ const EditCoursePage = () => {
       setDescription(course.description ?? '');
       setIcon(course.icon ?? '');
       setColor(course.color ?? PALETTE[0]);
-      setLocalTopics([...course.topics]);
+      if (skipTopicSync.current) {
+        skipTopicSync.current = false;
+      } else {
+        setLocalTopics([...course.topics]);
+      }
     }
   }, [course]);
 
@@ -169,6 +176,7 @@ const EditCoursePage = () => {
     const next = [...localTopics];
     [next[index - 1], next[index]] = [next[index], next[index - 1]];
     setLocalTopics(next);
+    skipTopicSync.current = true;
     reorderTopics.mutate(next.map((t) => t.id));
   }
 
@@ -177,6 +185,7 @@ const EditCoursePage = () => {
     const next = [...localTopics];
     [next[index], next[index + 1]] = [next[index + 1], next[index]];
     setLocalTopics(next);
+    skipTopicSync.current = true;
     reorderTopics.mutate(next.map((t) => t.id));
   }
 
