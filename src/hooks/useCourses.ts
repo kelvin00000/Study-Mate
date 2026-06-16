@@ -35,6 +35,8 @@ export function useCourse(id: string | undefined) {
       return fetchCourse(token!, id!);
     },
     enabled: !!id,
+    refetchInterval: (query) =>
+      query.state.data && !query.state.data.imageUrl ? 5000 : false,
   });
 }
 
