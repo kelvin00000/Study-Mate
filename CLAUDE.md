@@ -2,27 +2,57 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Monorepo Structure
+
+This project has two separate packages — a React frontend and an Express backend — in sibling directories under `studyMate/`:
+
+```
+studyMate/
+├── Study-Mate/     # React frontend (this directory)
+└── backend/        # Express API server
+```
+
+Each has its own `package.json` and `node_modules`. Run `npm install` in each directory independently.
+
 ## Commands
 
+### Frontend (`Study-Mate/`)
+
 ```bash
-npm run dev        # Start dev server (Vite)
+npm run dev        # Start Vite dev server
 npm run build      # Type-check + production build (tsc -b && vite build)
 npm run lint       # ESLint
 npm run preview    # Preview production build
 ```
 
-No test runner is configured.
+### Backend (`backend/`)
+
+```bash
+npm run dev        # Start dev server with hot reload (ts-node-dev)
+npm run build      # prisma generate && tsc
+npm run start      # Run compiled JS (node dist/src/server.js)
+npx prisma migrate dev    # Run database migrations
+npx prisma generate       # Regenerate Prisma client
+```
+
+No test runner is configured in either package.
 
 ## Environment Variables
 
-Create a `.env` file at the project root:
-
+### Frontend `.env`
 ```
 VITE_CLERK_PUBLISHABLE_KEY=...
-VITE_API_BASE_URL=...           # Backend base URL, e.g. http://localhost:3000
+VITE_API_BASE_URL=...           # e.g. http://localhost:5000
 ```
 
-## Architecture
+### Backend `.env`
+```
+DATABASE_URL=...                # PostgreSQL connection string
+CLERK_SECRET_KEY=...
+# Plus any AI provider keys (Anthropic, OpenAI) and Cloudinary config
+```
+
+## Frontend Architecture
 
 ### Tech Stack
 - **React 19 + Vite + TypeScript**
@@ -81,7 +111,7 @@ On `TopicChatPage`, objectives are auto-generated on first visit if none exist (
 
 ### Onboarding Flow
 
-Multi-step wizard (steps 0–6): 5 preference steps (`StepForm`), 1 interests step (`InterestsForm`), 1 confirmation screen (`FinalOnboardingScreen`). On submit, calls `useSubmitPreference` then `user.reload()` to pick up the updated `publicMetadata.onboarded` flag before navigating to `/dashboard`.
+Multi-step wizard (steps 0-6): 5 preference steps (`StepForm`), 1 interests step (`InterestsForm`), 1 confirmation screen (`FinalOnboardingScreen`). On submit, calls `useSubmitPreference` then `user.reload()` to pick up the updated `publicMetadata.onboarded` flag before navigating to `/dashboard`.
 
 ### Layout Pattern
 
@@ -94,3 +124,43 @@ All post-auth pages use a shared layout: `<Sidebar>` (fixed desktop, overlay mob
 - Use Tailwind classes for layout and spacing
 - Fonts: `Archivo Black` for headings, `Roboto` for body (loaded via Google Fonts in `index.html`)
 - Course accent color is a hex string from the API; use `${color}18` / `${color}20` for tinted backgrounds
+
+## Backend Architecture
+
+### Tech Stack
+- **Express 5 + TypeScript** (compiled with `tsc`, dev via `ts-node-dev`)
+- **Prisma ORM** with PostgreSQL — schema at `prisma/schema.prisma`, generated client output to `generated/prisma/`
+- **Clerk** for auth (`@clerk/express`) — `clerkMiddleware()` globally, `requireAuth` middleware per-route
+- **AI providers**: `@anthropic-ai/sdk` and `openai` for course generation, chat, objectives, quiz
+- **Cloudinary** for image uploads
+
+### Backend Structure
+
+```
+backend/src/
+├── server.ts              # Entry point (listens on PORT, default 5000)
+├── app.ts                 # Express app setup (cors, morgan, clerkMiddleware, routes)
+├── routes/index.ts        # Mounts all route groups under /api
+├── routes/*.routes.ts     # Route definitions
+├── controllers/*.ts       # Request handlers
+├── services/*.ts          # Business logic + AI calls
+├── middleware/             # requireAuth, globalErrorHandler
+├── config/                # db.config.ts (Prisma), cloudinary.config.ts
+├── errors/                # AppError hierarchy (NotFoundError, ValidationError, etc.)
+└── utils/catchAsync.ts    # Async error wrapper for controllers
+```
+
+### API Routes (all prefixed `/api`)
+
+| Prefix | Resource |
+|--------|----------|
+| `/api/auth` | Clerk webhook / sync |
+| `/api/user` | User preferences |
+| `/api/courses` | Course CRUD, topic generation, enrollment, completion |
+| `/api/chat` | Topic chat (SSE streaming) |
+| `/api/illustrations` | AI-generated illustrations |
+| `/api/streak` | Daily streak, XP, leaderboard |
+
+### Key Data Models
+
+User, Course, Topic (ordered within course), Enrollment (user-course join), TopicCompletion, ChatMessage, LearningObjective, UserObjectiveCoverage, UserStreak, DailyActivity. See `prisma/schema.prisma` for full schema.
