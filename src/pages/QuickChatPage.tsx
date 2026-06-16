@@ -185,14 +185,12 @@ function ChatBubble({
 
 // ── Conversation list item ───────────────────────────────────────────────────
 function ConversationItem({
-  id,
   title,
   updatedAt,
   active,
   onSelect,
   onDelete,
 }: {
-  id: string;
   title: string;
   updatedAt: string;
   active: boolean;
@@ -474,7 +472,6 @@ const QuickChatPage = () => {
               conversations?.map((c) => (
                 <ConversationItem
                   key={c.id}
-                  id={c.id}
                   title={c.title}
                   updatedAt={c.updatedAt}
                   active={c.id === activeConvoId}
@@ -744,7 +741,6 @@ const QuickChatPage = () => {
                 {conversations?.map((c) => (
                   <ConversationItem
                     key={c.id}
-                    id={c.id}
                     title={c.title}
                     updatedAt={c.updatedAt}
                     active={c.id === activeConvoId}
