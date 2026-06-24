@@ -190,12 +190,14 @@ function ConversationItem({
   active,
   onSelect,
   onDelete,
+  isDeleting,
 }: {
   title: string;
   updatedAt: string;
   active: boolean;
   onSelect: () => void;
   onDelete: () => void;
+  isDeleting?: boolean;
 }) {
   const timeAgo = useMemo(() => {
     const diff = Date.now() - new Date(updatedAt).getTime();
@@ -230,15 +232,19 @@ function ConversationItem({
           {timeAgo}
         </p>
       </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        className="opacity-0 group-hover:opacity-100 p-1 rounded-md transition-all hover:bg-red-50"
-      >
-        <Trash2 size={12} className="text-red-400" />
-      </button>
+      {isDeleting ? (
+        <Loader2 size={12} className="animate-spin text-red-400 shrink-0" />
+      ) : (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="opacity-0 group-hover:opacity-100 p-1 rounded-md transition-all hover:bg-red-50"
+        >
+          <Trash2 size={12} className="text-red-400" />
+        </button>
+      )}
     </div>
   );
 }
@@ -338,9 +344,13 @@ const QuickChatPage = () => {
     setChatListOpen(false);
   };
 
+  const [deletingConvoId, setDeletingConvoId] = useState<string | null>(null);
+
   const handleDeleteConvo = (id: string) => {
+    setDeletingConvoId(id);
     deleteConvo.mutate(id, {
       onSuccess: () => {
+        setDeletingConvoId(null);
         if (id === activeConvoId) {
           const remaining = conversations?.filter((c) => c.id !== id) ?? [];
           if (remaining.length > 0) {
@@ -353,6 +363,7 @@ const QuickChatPage = () => {
           }
         }
       },
+      onError: () => setDeletingConvoId(null),
     });
   };
 
@@ -477,6 +488,7 @@ const QuickChatPage = () => {
                   active={c.id === activeConvoId}
                   onSelect={() => handleSelectConvo(c.id)}
                   onDelete={() => handleDeleteConvo(c.id)}
+                  isDeleting={deletingConvoId === c.id}
                 />
               ))
             )}
