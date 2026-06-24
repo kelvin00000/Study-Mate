@@ -7,14 +7,17 @@ import {
   MessageCircle,
   Trophy,
   Plus,
-  HelpCircle,
+
   X,
   Settings,
   ChevronDown,
+  Crown,
+
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
 import { useConversations } from "../../hooks/useQuickChat";
+import { useSubscription } from "../../hooks/useSubscription";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -38,6 +41,8 @@ function SidebarContent({
 }) {
   const location = useLocation();
   const { data: conversations } = useConversations();
+  const { data: subscription } = useSubscription();
+  const isFree = !subscription || subscription.plan === "free";
   const [recentChatsOpen, setRecentChatsOpen] = useState(true);
   const recentChats = (conversations ?? []).slice(0, 5);
 
@@ -65,6 +70,11 @@ function SidebarContent({
                 className="container-hover:text-gray-900"
               />
               {label}
+              {label === "Quick Chat" && isFree && (
+                <span className="ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-600">
+                  <Crown size={10} /> PRO
+                </span>
+              )}
             </Link>
           );
         })}
@@ -123,14 +133,7 @@ function SidebarContent({
           Settings
         </Link>
 
-        <Link
-          to="/help"
-          onClick={onClose}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm mb-0.5 text-moderate-green/70 font-medium transition-all hover:bg-gray-100"
-        >
-          <HelpCircle size={18} />
-          Help Center
-        </Link>
+
         <UserButton
           showName={true}
           appearance={{

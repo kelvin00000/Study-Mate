@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
+import { toast } from "sonner";
 import {
   fetchObjectives,
   postGenerateObjectives,
@@ -34,6 +35,9 @@ export function useGenerateObjectives(courseId: string | undefined, topicId: str
     onSuccess: (data) => {
       queryClient.setQueryData(["objectives", courseId, topicId], data);
     },
+    onError: () => {
+      toast.error("Failed to generate objectives.");
+    },
   });
 }
 
@@ -47,6 +51,10 @@ export function useAddObjective(courseId: string, topicId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["objectives", courseId, topicId] });
+      toast.success("Objective added.");
+    },
+    onError: () => {
+      toast.error("Failed to add objective.");
     },
   });
 }
@@ -67,6 +75,10 @@ export function useUpdateObjective(courseId: string, topicId: string) {
           return prev.map((obj) => (obj.id === data.id ? { ...obj, text: data.text } : obj));
         },
       );
+      toast.success("Objective updated.");
+    },
+    onError: () => {
+      toast.error("Failed to update objective.");
     },
   });
 }
@@ -81,6 +93,10 @@ export function useDeleteObjective(courseId: string, topicId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["objectives", courseId, topicId] });
+      toast.success("Objective deleted.");
+    },
+    onError: () => {
+      toast.error("Failed to delete objective.");
     },
   });
 }

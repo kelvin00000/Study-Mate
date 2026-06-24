@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/clerk-react";
+import { toast } from "sonner";
 import {
   fetchCourses,
   fetchCourse,
@@ -47,6 +48,9 @@ export function useGenerateCourse() {
       const token = await getToken();
       return postGenerateTopics(token!, title);
     },
+    onError: () => {
+      toast.error("Failed to generate course. Please try again.");
+    },
   });
 }
 
@@ -60,6 +64,10 @@ export function useCreateCourse() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      toast.success("Course created successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to create course.");
     },
   });
 }
@@ -75,6 +83,10 @@ export function useUpdateCourse(courseId: string) {
     onSuccess: (data) => {
       queryClient.setQueryData(["courses", courseId], data);
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      toast.success("Course updated.");
+    },
+    onError: () => {
+      toast.error("Failed to update course.");
     },
   });
 }
@@ -89,6 +101,10 @@ export function useDeleteCourse() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      toast.success("Course deleted.");
+    },
+    onError: () => {
+      toast.error("Failed to delete course.");
     },
   });
 }
@@ -103,6 +119,10 @@ export function useAddTopic(courseId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+      toast.success("Topic added.");
+    },
+    onError: () => {
+      toast.error("Failed to add topic.");
     },
   });
 }
@@ -117,6 +137,10 @@ export function useUpdateTopic(courseId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+      toast.success("Topic updated.");
+    },
+    onError: () => {
+      toast.error("Failed to update topic.");
     },
   });
 }
@@ -131,6 +155,10 @@ export function useDeleteTopic(courseId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+      toast.success("Topic deleted.");
+    },
+    onError: () => {
+      toast.error("Failed to delete topic.");
     },
   });
 }
@@ -145,6 +173,9 @@ export function useReorderTopics(courseId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
+    },
+    onError: () => {
+      toast.error("Failed to reorder topics.");
     },
   });
 }
@@ -161,6 +192,9 @@ export function useCompleteTopic(courseId: string) {
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
       queryClient.invalidateQueries({ queryKey: ["courses"] });
       queryClient.invalidateQueries({ queryKey: ["streak"] });
+    },
+    onError: () => {
+      toast.error("Failed to complete topic.");
     },
   });
 }

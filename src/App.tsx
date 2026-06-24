@@ -17,6 +17,8 @@ import TopicQuizPage from "./pages/TopicQuizPage";
 import SettingsPage from "./pages/SettingsPage";
 import QuickChatPage from "./pages/QuickChatPage";
 import AchievementsPage from "./pages/AchievementsPage";
+import PricingPage from "./pages/PricingPage";
+import PaymentCallbackPage from "./pages/PaymentCallbackPage";
 
 function App() {
   const location = useLocation();
@@ -39,6 +41,7 @@ function App() {
 
       <Route element={<RequireAuth />}>
         <Route path="/onBoarding" element={<OnboardingPage />} />
+        <Route path="/payment/callback" element={<PaymentCallbackPage />} />
 
         <Route element={<RequireOnboarded />}>
           <Route path="/dashboard" element={<HomePage />} />
@@ -50,6 +53,7 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/quick-chat" element={<QuickChatPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
         </Route>
       </Route>
     </Routes>

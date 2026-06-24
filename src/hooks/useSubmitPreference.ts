@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import { apiCall } from "../api/apicall"
 import { useAuth } from "@clerk/clerk-react"
+import { toast } from "sonner"
 import { onboardingSteps } from "../constants/Onboardingdata"
 
 const getOptionIndex = (stepIndex: number, selection: string): number =>
@@ -27,7 +28,10 @@ export const useSubmitPreference = () => {
                 },
                 body: JSON.stringify({ educationLevel, explanationDepth, learningGoal, studySessionDuration, interests: data.interests }),
             })
-        }
+        },
+        onError: () => {
+            toast.error("Failed to save preferences.")
+        },
     })
 }
 
