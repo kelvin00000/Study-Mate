@@ -1,5 +1,6 @@
 import { useAuth } from "@clerk/clerk-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   fetchConversations,
   fetchConversationMessages,
@@ -46,6 +47,9 @@ export function useCreateConversation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quickConversations"] });
     },
+    onError: () => {
+      toast.error("Failed to create conversation.");
+    },
   });
 }
 
@@ -59,6 +63,10 @@ export function useDeleteConversation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quickConversations"] });
+      toast.success("Conversation deleted.");
+    },
+    onError: () => {
+      toast.error("Failed to delete conversation.");
     },
   });
 }

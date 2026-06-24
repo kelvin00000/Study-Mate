@@ -39,7 +39,7 @@ const CourseDetailPage = () => {
           </button>
         </div>
 
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 px-4 py-4 lg:p-8">
           {/* Back button */}
           <button
             className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 cursor-pointer shadow-md bg-white border border-laurel-green/30 mb-6"
@@ -72,41 +72,38 @@ const CourseDetailPage = () => {
           {!isLoading && !isError && course && (
             <>
               {/* Course header card */}
-              <div className="rounded-2xl p-6 mb-6 border bg-white border-laurel-green/20">
-                <div className="flex items-start justify-between gap-4 mb-5">
-                  <div className="flex items-start gap-4 flex-1">
-                    {course.imageUrl ? (
-                      <img
-                        src={course.imageUrl}
-                        alt={course.title}
-                        className="w-14 h-14 rounded-2xl object-cover shrink-0"
-                      />
-                    ) : (
-                      <div
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                        style={{ backgroundColor: `${course.color}18` }}
-                      >
-                        {course.icon}
-                      </div>
-                    )}
-                    <div>
-                      <h1 className="text-xl lg:text-2xl font-bold mb-1 text-deep-bluish">
+              <div className="rounded-2xl p-4 lg:p-6 mb-6 border bg-white border-laurel-green/20">
+                <div className="flex items-start gap-3 lg:gap-4 mb-4 lg:mb-5">
+                  {course.imageUrl ? (
+                    <img
+                      src={course.imageUrl}
+                      alt={course.title}
+                      className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl object-cover shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center text-xl lg:text-2xl shrink-0"
+                      style={{ backgroundColor: `${course.color}18` }}
+                    >
+                      {course.icon}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h1 className="text-lg lg:text-2xl font-bold mb-1 text-deep-bluish wrap-break-word">
                         {course.title}
                       </h1>
-                      <p className="text-sm leading-relaxed text-moderate-green/70">
-                        {course.description}
-                      </p>
+                      <button
+                        onClick={() => navigate(`/courses/${id}/edit`)}
+                        className="shrink-0 p-2 rounded-xl border border-laurel-green/20 text-moderate-green/70 transition-colors hover:bg-laurel-green/10"
+                        title="Edit course"
+                      >
+                        <Pencil size={16} />
+                      </button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-normal text-moderate-green">Edit course</p>
-                    <button
-                      onClick={() => navigate(`/courses/${id}/edit`)}
-                      className="shrink-0 p-2 rounded-xl border border-laurel-green/20 text-moderate-green/70 transition-colors hover:bg-laurel-green/10"
-                      title="Edit course"
-                    >
-                      <Pencil size={16} />
-                    </button>
+                    <p className="text-xs lg:text-sm leading-relaxed text-moderate-green/70">
+                      {course.description}
+                    </p>
                   </div>
                 </div>
 
@@ -162,7 +159,7 @@ const CourseDetailPage = () => {
                                   )
                               : undefined
                           }
-                          className={`flex items-center gap-4 rounded-xl p-4 border w-full text-left transition-all bg-white ${!unlocked ? "border-laurel-green/20" : ""}${clickable ? " hover:shadow-sm cursor-pointer" : " cursor-default"}`}
+                          className={`flex items-center gap-3 lg:gap-4 rounded-xl p-3 lg:p-4 border w-full text-left transition-all bg-white ${!unlocked ? "border-laurel-green/20" : ""}${clickable ? " hover:shadow-sm cursor-pointer" : " cursor-default"}`}
                           style={{
                             borderColor: unlocked ? course.color : undefined,
                           }}

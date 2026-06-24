@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Check, Menu } from 'lucide-react';
+import { Check, Menu, Crown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
 import { useUserPreferences } from '../hooks/useUserPreferences';
 import { useSubmitPreference } from '../hooks/useSubmitPreference';
 import { onboardingSteps } from '../constants/Onboardingdata';
+import { useSubscription, useCancelSubscription } from '../hooks/useSubscription';
 
 const DEFAULT_INTERESTS = [
   "Football", "Basketball", "Baseball", "Tennis", "Swimming",
@@ -42,6 +44,8 @@ const SettingsPage = () => {
   const queryClient = useQueryClient();
   const { data: prefs, isLoading } = useUserPreferences();
   const { mutate: submitPreference, isPending } = useSubmitPreference();
+  const { data: subscription } = useSubscription();
+  const cancelSub = useCancelSubscription();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -136,6 +140,85 @@ const SettingsPage = () => {
                   </p>
                 </div>
               </div>
+            </section>
+
+            {/* Subscription */}
+            <section className="bg-white rounded-2xl p-6 mb-6 border border-laurel-green/20">
+              <h2 className="text-base font-semibold mb-4 text-deep-bluish">
+                Subscription
+              </h2>
+              {subscription ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold ${
+                      subscription.plan === 'pro'
+                        ? 'bg-amber-50 text-amber-700'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {subscription.plan === 'pro' && <Crown size={14} />}
+                      {subscription.plan === 'pro'
+                        ? subscription.isTrial
+                          ? 'Pro (Trial)'
+                          : subscription.hasPaystackSubscription
+                            ? 'Pro'
+                            : 'Pro (Lifetime)'
+                        : 'Free'}
+                    </span>
+                    {subscription.status === 'cancelled' && subscription.currentPeriodEnd && (
+                      <span className="text-xs text-moderate-green/70">
+                        Active until {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+
+                  {subscription.plan === 'pro' && subscription.isTrial && subscription.currentPeriodEnd && (
+                    <div className="mb-3">
+                      <p className="text-sm text-moderate-green/70">
+                        Trial ends: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                      </p>
+                      <Link
+                        to="/pricing"
+                        className="inline-flex items-center gap-1.5 mt-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
+                      >
+                        <Crown size={14} /> Upgrade Now
+                      </Link>
+                    </div>
+                  )}
+
+                  {subscription.plan === 'pro' && subscription.hasPaystackSubscription && subscription.status !== 'cancelled' && (
+                    <div className="space-y-2">
+                      {subscription.currentPeriodEnd && (
+                        <p className="text-sm text-moderate-green/70">
+                          Next renewal: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                          {subscription.interval && ` (${subscription.interval})`}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to cancel your Pro subscription? You\'ll keep access until the end of your billing period.')) {
+                            cancelSub.mutate();
+                          }
+                        }}
+                        disabled={cancelSub.isPending}
+                        className="text-sm text-red-500 hover:text-red-600 transition-colors font-medium"
+                      >
+                        {cancelSub.isPending ? 'Cancelling...' : 'Cancel Subscription'}
+                      </button>
+                    </div>
+                  )}
+
+                  {subscription.plan === 'free' && (
+                    <Link
+                      to="/pricing"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
+                    >
+                      <Crown size={14} /> Upgrade to Pro
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <div className="animate-pulse h-10 w-32 rounded-xl bg-gray-100" />
+              )}
             </section>
 
             {/* Learning Preferences */}
