@@ -12,7 +12,7 @@ import {
   Settings,
   ChevronDown,
   Crown,
-  Lock,
+
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";

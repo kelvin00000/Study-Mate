@@ -14,7 +14,7 @@ const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: (delay: number = 0) => ({
         opacity: 1, y: 0,
-        transition: { duration: 0.6, delay, ease: 'easeOut' },
+        transition: { duration: 0.6, delay, ease: 'easeOut' as const },
     }),
 };
 
@@ -25,22 +25,22 @@ const staggerContainer = {
 
 const staggerChild = {
     hidden: { opacity: 0, y: 24 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
 const slideInLeft = {
     hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' } },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' as const } },
 };
 
 const slideInRight = {
     hidden: { opacity: 0, x: 50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' } },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' as const } },
 };
 
 const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: 'easeOut' as const } },
 };
 
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
