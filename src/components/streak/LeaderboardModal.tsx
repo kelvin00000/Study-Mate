@@ -11,12 +11,11 @@ interface LeaderboardModalProps {
 function AvatarFallback({ name, size = 32 }: { name: string; size?: number }) {
   return (
     <div
-      className="rounded-full flex items-center justify-center text-white font-bold shrink-0"
+      className="rounded-full flex items-center justify-center text-white font-bold shrink-0 bg-moderate-green"
       style={{
         width: size,
         height: size,
         fontSize: size * 0.4,
-        backgroundColor: "var(--primary)",
       }}
     >
       {name.charAt(0).toUpperCase()}
@@ -42,10 +41,7 @@ function RankBadge({ rank }: { rank: number }) {
     );
   }
   return (
-    <span
-      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-      style={{ backgroundColor: "var(--secondary)", color: "var(--text-secondary)" }}
-    >
+    <span className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-light-cream text-laurel-green">
       {rank}
     </span>
   );
@@ -54,8 +50,7 @@ function RankBadge({ rank }: { rank: number }) {
 function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
   return (
     <div
-      className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-      style={entry.isCurrentUser ? { backgroundColor: "var(--secondary)" } : undefined}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${entry.isCurrentUser ? "bg-light-cream" : ""}`}
     >
       <RankBadge rank={entry.rank} />
 
@@ -69,33 +64,21 @@ function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
         <AvatarFallback name={entry.displayName} />
       )}
 
-      <span
-        className="flex-1 min-w-0 text-sm font-medium truncate"
-        style={{ color: "var(--text-primary)" }}
-      >
+      <span className="flex-1 min-w-0 text-sm font-medium truncate text-deep-bluish">
         {entry.displayName}
         {entry.isCurrentUser && (
-          <span
-            className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-            style={{ backgroundColor: "var(--primary)", color: "#fff" }}
-          >
+          <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-moderate-green text-white">
             You
           </span>
         )}
       </span>
 
       <div className="flex items-center gap-2 shrink-0">
-        <div
-          className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg"
-          style={{ backgroundColor: "var(--bg)", color: "var(--primary)" }}
-        >
+        <div className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg bg-moderate-green/10 text-moderate-green">
           <Flame size={11} />
           {entry.currentStreak}d
         </div>
-        <span
-          className="text-xs font-bold"
-          style={{ color: "var(--text-secondary)" }}
-        >
+        <span className="text-xs font-bold text-laurel-green">
           {entry.totalXp.toLocaleString()} XP
         </span>
       </div>
@@ -119,8 +102,7 @@ export function LeaderboardModal({ open, onClose }: LeaderboardModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0"
-            style={{ backgroundColor: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -132,23 +114,16 @@ export function LeaderboardModal({ open, onClose }: LeaderboardModalProps) {
             className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
-            <div
-              className="px-5 py-4 border-b flex items-center justify-between"
-              style={{ borderColor: "var(--border)" }}
-            >
+            <div className="px-5 py-4 border-b border-laurel-green/20 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Trophy size={18} style={{ color: "var(--primary)" }} />
-                <span
-                  className="font-bold text-base"
-                  style={{ color: "var(--text-primary)" }}
-                >
+                <Trophy size={18} className="text-moderate-green" />
+                <span className="font-bold text-base text-deep-bluish">
                   Leaderboard
                 </span>
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg transition-colors hover:bg-gray-100"
-                style={{ color: "var(--text-secondary)" }}
+                className="p-1.5 rounded-lg transition-colors hover:bg-light-cream text-laurel-green cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -161,16 +136,12 @@ export function LeaderboardModal({ open, onClose }: LeaderboardModalProps) {
                   {Array.from({ length: 10 }).map((_, i) => (
                     <div
                       key={i}
-                      className="h-12 rounded-xl animate-pulse"
-                      style={{ backgroundColor: "var(--secondary)" }}
+                      className="h-12 rounded-xl animate-pulse bg-light-cream"
                     />
                   ))}
                 </div>
               ) : !data ? (
-                <p
-                  className="text-sm text-center py-8"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="text-sm text-center py-8 text-laurel-green">
                   Failed to load leaderboard.
                 </p>
               ) : (
@@ -183,10 +154,7 @@ export function LeaderboardModal({ open, onClose }: LeaderboardModalProps) {
 
                   {showCurrentUserSeparately && data.currentUserEntry && (
                     <>
-                      <div
-                        className="my-3 border-t border-dashed"
-                        style={{ borderColor: "var(--border)" }}
-                      />
+                      <div className="my-3 border-t border-dashed border-laurel-green/20" />
                       <LeaderboardRow entry={data.currentUserEntry} />
                     </>
                   )}

@@ -59,8 +59,8 @@ const LoadingScreen = ({ loading }: LoadingScreenProps) => {
                             absolute left-1/2 top-0
                             h-2 w-2 -translate-x-1/2
                             rounded-full
-                            bg-(--purple-accent)
-                            shadow-[0_0_20px_rgba(101,65,240,0.7)]
+                            bg-moderate-green
+                            shadow-[0_0_20px_rgba(39,97,82,0.7)]
                             "
                         />
                         </motion.div>

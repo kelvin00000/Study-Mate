@@ -38,8 +38,8 @@ const HomePage = () => {
 
         <main className="flex-1 overflow-y-auto px-4 py-5 lg:px-8 lg:py-7">
           {/* Welcome + Streak */}
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8 h-[40%]">
-            <div className='self-center mt-10 lg:mt-0 lg:w-[60%]'>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8 lg:h-[40%]">
+            <div className='self-center mt-4 lg:mt-0 lg:w-[60%]'>
               <h1 className="text-2xl lg:text-3xl text-deep-bluish mb-1 font-semibold">
                 Welcome back, {user?.firstName ?? 'Learner'}.
               </h1>
@@ -62,7 +62,7 @@ const HomePage = () => {
           </div>
 
           {/* Your Courses */}
-          <section className="mt-10 lg:mt-0 mb-8">
+          <section className="mt-6 lg:mt-0 mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2
                 className="text-base font-semibold text-deep-bluish"
@@ -129,7 +129,7 @@ const HomePage = () => {
               Recommended For You
             </h2>
             <div
-              className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white shadow-lg shadow-moderate-green/20 rounded-[20px]"
+              className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white shadow-lg shadow-moderate-green/20 rounded-[20px]"
             >
               <div>
                 <div className="flex items-center gap-2 mb-2 opacity-80">

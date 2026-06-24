@@ -13,11 +13,6 @@ import LoadingScreen from "../../../components/LoadingScreen";
 import { useSubmitPreference, useSyncUser } from "../../../hooks/useSubmitPreference";
 
 
-// type props = {
-//     setOnboardingInfo: React.Dispatch<React.SetStateAction<{selections: {title:string, selection:string}[], interests:string[]}>>
-//     onboardingInfo: {selections: {title:string, selection:string}[], interests:string[]}
-// };
-
 export default function OnboardingPage() {
     const navigate = useNavigate();
     const { user } = useUser();
@@ -43,7 +38,6 @@ export default function OnboardingPage() {
             .finally(() => setSyncing(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    
 
 
     const handleSendUserInfo = async () => {
@@ -92,7 +86,6 @@ export default function OnboardingPage() {
             }));
         }
         else if(step>5){
-            // CALL ENDPOINT SEND FUNC
             await handleSendUserInfo();
             return;
         }
@@ -107,8 +100,8 @@ export default function OnboardingPage() {
         <>
             <title>On Boarding</title>
 
-            <main className="h-screen bg-(--bg) p-2">
-                <section className="py-4 px-2.5 lg:px-5 w-full h-full rounded-4xl bg-(--card)">
+            <main className="h-screen bg-light-cream p-2">
+                <section className="py-4 px-2.5 lg:px-5 w-full h-full rounded-4xl bg-white">
                     <Logo subtitle="Learn. Focus. Achieve" />
 
                     <div className="flex items-center h-[94%]">
@@ -135,18 +128,18 @@ export default function OnboardingPage() {
                                 }
                             </AnimatePresence>
 
-                            <div className="m-0 text-(--muted) text-[14px]">*You can always change these in settings*</div>
+                            <div className="m-0 text-laurel-green text-[14px]">*You can always change these in settings*</div>
 
                             <button
                                 onClick={()=>{
                                     if(step>6) return;
                                     handleSubmit();
                                 }}
-                                className="mt-3 lg:mt-4 flex min-h-13.75 w-[90%] lg:w-[60%] items-center justify-between rounded-2xl bg-(--purple-primary) px-6 text-lg font-semibold text-white shadow-[0_10px_30px_rgba(125,74,244,0.25)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-pointer">
+                                className="mt-3 lg:mt-4 flex min-h-13.75 w-[90%] lg:w-[60%] items-center justify-between rounded-2xl bg-deep-bluish px-6 text-lg font-semibold text-white shadow-[0_10px_30px_rgba(13,58,53,0.2)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-pointer">
                                 <span>Continue</span>
 
                                 <div className="flex h-7 lg:h-9 w-7 lg:w-9 items-center justify-center rounded-full bg-white">
-                                    <ArrowRight size={20} className="text-(--purple-primary)" />
+                                    <ArrowRight size={20} className="text-deep-bluish" />
                                 </div>
                             </button>
 
@@ -191,8 +184,8 @@ const ProgressBar = ({ step, totalSteps }: ProgressProps) => {
                     className={`
                         h-2 w-10 rounded-full transition-all duration-500 ease-in-out
                         ${active
-                            ? "bg-(--purple-primary)"
-                            : "bg-[#DDD6FE]"
+                            ? "bg-moderate-green"
+                            : "bg-laurel-green/30"
                         }
                     `}
                 />

@@ -36,26 +36,26 @@ const MessageModal = ({ show, setShow, message }: MessageModalProps) => {
                         <button
                             onClick={() => setShow(false)}
                             className="
-                            absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-[#F3F0FF] transition hover:bg-[#E9E2FF]"
+                            absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-light-cream transition hover:bg-laurel-green/20"
                         >
-                            <X size={20} className="text-(--purple-accent)" />
+                            <X size={20} className="text-deep-bluish" />
                         </button>
 
                         <div
-                        className=" mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-r from-[#A98BFA] via-[#C4B5FD] to-[#E9D5FF]">
-                        <div className="h-7 w-7 rounded-full bg-(--purple-primary)" />
+                        className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-moderate-green/15">
+                        <div className="h-7 w-7 rounded-full bg-moderate-green" />
                         </div>
 
-                        <h2 className="text-2xl font-bold text-(--text-primary)">Notice</h2>
+                        <h2 className="text-2xl font-bold text-deep-bluish">Notice</h2>
 
-                        <p className="mt-4 leading-relaxed text-(--text-secondary)">{message}</p>
+                        <p className="mt-4 leading-relaxed text-laurel-green">{message}</p>
 
                         <button
                             onClick={() => setShow(false)}
                             className="
                             mt-8 h-14 w-full rounded-2xl
-                            bg-(--purple-primary)
-                            font-semibold text-white
+                            bg-deep-bluish
+                            font-semibold text-white cursor-pointer
                             transition hover:opacity-90"
                         >
                             Close
