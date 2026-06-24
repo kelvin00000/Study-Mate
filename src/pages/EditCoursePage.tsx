@@ -295,11 +295,10 @@ const EditCoursePage = () => {
         <main className="flex-1 p-6 lg:p-8 max-w-3xl">
           {/* Back */}
           <button
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 cursor-pointer shadow-md bg-white border border-laurel-green/30 mb-6"
             onClick={() => navigate(`/courses/${id}`)}
-            className="flex items-center gap-1.5 text-sm font-medium mb-6 transition-opacity hover:opacity-70 text-moderate-green"
           >
-            <ArrowLeft size={16} />
-            Back to Course
+            <ArrowLeft size={18} className="text-moderate-green" />
           </button>
 
           <h1 className="text-2xl font-bold mb-6 text-deep-bluish">

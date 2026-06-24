@@ -16,6 +16,7 @@ import TopicChatPage from "./pages/TopicChatPage";
 import TopicQuizPage from "./pages/TopicQuizPage";
 import SettingsPage from "./pages/SettingsPage";
 import QuickChatPage from "./pages/QuickChatPage";
+import AchievementsPage from "./pages/AchievementsPage";
 
 function App() {
   const location = useLocation();
@@ -47,6 +48,7 @@ function App() {
           <Route path="/courses/:courseId/topics/:topicIndex" element={<TopicChatPage />} />
           <Route path="/courses/:courseId/topics/:topicIndex/quiz" element={<TopicQuizPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/quick-chat" element={<QuickChatPage />} />
         </Route>
       </Route>
