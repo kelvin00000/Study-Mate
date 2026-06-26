@@ -183,6 +183,71 @@ function ChatBubble({
   );
 }
 
+// ── Delete confirmation modal ────────────────────────────────────────────────
+function DeleteConfirmModal({
+  open,
+  onCancel,
+  onConfirm,
+  isDeleting,
+}: {
+  open: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/40"
+            onClick={onCancel}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="relative w-[90%] max-w-sm rounded-2xl p-5 shadow-xl"
+            style={{ backgroundColor: C.cardBg }}
+          >
+            <h3 className="text-sm font-semibold mb-1" style={{ color: C.ink }}>
+              Delete conversation?
+            </h3>
+            <p className="text-xs mb-5" style={{ color: C.inkMuted }}>
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={onCancel}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl text-xs font-semibold transition-colors hover:bg-black/5 cursor-pointer"
+                style={{ color: C.inkMid }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirm}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-red-500 text-white transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <Loader2 size={14} className="animate-spin mx-auto" />
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ── Conversation list item ───────────────────────────────────────────────────
 function ConversationItem({
   title,
@@ -240,7 +305,7 @@ function ConversationItem({
             e.stopPropagation();
             onDelete();
           }}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded-md transition-all hover:bg-red-50"
+          className="md:opacity-0 md:group-hover:opacity-100 p-1 rounded-md transition-all hover:bg-red-50"
         >
           <Trash2 size={12} className="text-red-400" />
         </button>
@@ -345,25 +410,35 @@ const QuickChatPage = () => {
   };
 
   const [deletingConvoId, setDeletingConvoId] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const handleDeleteConvo = (id: string) => {
-    setDeletingConvoId(id);
-    deleteConvo.mutate(id, {
+    setDeleteTargetId(id);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTargetId) return;
+    setDeletingConvoId(deleteTargetId);
+    deleteConvo.mutate(deleteTargetId, {
       onSuccess: () => {
+        const deletedId = deleteTargetId;
         setDeletingConvoId(null);
-        if (id === activeConvoId) {
-          const remaining = conversations?.filter((c) => c.id !== id) ?? [];
+        setDeleteTargetId(null);
+        if (deletedId === activeConvoId) {
+          const remaining = conversations?.filter((c) => c.id !== deletedId) ?? [];
           if (remaining.length > 0) {
             setActiveConvoId(remaining[0].id);
             seededConvoId.current = null;
             setMessages([]);
           } else {
-            // Create a new one
             handleNewChat();
           }
         }
       },
-      onError: () => setDeletingConvoId(null),
+      onError: () => {
+        setDeletingConvoId(null);
+        setDeleteTargetId(null);
+      },
     });
   };
 
@@ -523,13 +598,6 @@ const QuickChatPage = () => {
             >
               {activeTitle}
             </h1>
-            <button
-              onClick={handleNewChat}
-              className="md:hidden p-1.5 rounded-lg transition-colors hover:bg-black/5"
-              style={{ color: C.inkMid }}
-            >
-              <Plus size={18} />
-            </button>
           </div>
 
           {/* Messages */}
@@ -758,6 +826,7 @@ const QuickChatPage = () => {
                     active={c.id === activeConvoId}
                     onSelect={() => handleSelectConvo(c.id)}
                     onDelete={() => handleDeleteConvo(c.id)}
+                    isDeleting={deletingConvoId === c.id}
                   />
                 ))}
               </div>
@@ -766,6 +835,12 @@ const QuickChatPage = () => {
         )}
       </AnimatePresence>
 
+      <DeleteConfirmModal
+        open={!!deleteTargetId}
+        onCancel={() => setDeleteTargetId(null)}
+        onConfirm={confirmDelete}
+        isDeleting={!!deletingConvoId}
+      />
       <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
