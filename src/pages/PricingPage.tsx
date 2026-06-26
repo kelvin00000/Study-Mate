@@ -20,8 +20,8 @@ const PRICES: Record<Region, Record<Interval, { amount: string; perMonth: string
 };
 
 const FEATURES = [
-  { label: "Courses", free: "2", pro: "Unlimited" },
-  { label: "Chat messages/day", free: "15", pro: "Unlimited" },
+  { label: "Courses", free: "1", pro: "Unlimited" },
+  { label: "Chat messages/day", free: "5", pro: "Unlimited" },
   { label: "Quick Chat", free: false, pro: true },
   { label: "AI Illustrations", free: false, pro: true },
   { label: "Quizzes/day", free: "1", pro: "Unlimited" },
@@ -99,7 +99,7 @@ const PricingPage = () => {
             </Link>
 
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-semibold text-deep-bluish mb-2">
+              <h1 className="text-xl sm:text-2xl font-semibold text-deep-bluish mb-2">
                 Choose Your Plan
               </h1>
               <p className="text-sm text-moderate-green/70">
@@ -114,7 +114,7 @@ const PricingPage = () => {
                   <button
                     key={int}
                     onClick={() => setInterval(int)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-all ${
                       interval === int
                         ? "bg-deep-bluish text-white"
                         : "text-moderate-green/70 hover:text-deep-bluish"
@@ -122,7 +122,7 @@ const PricingPage = () => {
                   >
                     {int === "monthly" ? "Monthly" : "Yearly"}
                     {int === "yearly" && (
-                      <span className="ml-1.5 text-xs opacity-80">Save ~70%</span>
+                      <span className="ml-1.5 text-xs opacity-80 hidden sm:inline">Save ~70%</span>
                     )}
                   </button>
                 ))}
@@ -132,7 +132,7 @@ const PricingPage = () => {
             {/* Plans */}
             <div className="grid md:grid-cols-2 gap-5 mb-10">
               {/* Free Plan */}
-              <div className="bg-white rounded-2xl p-6 border border-laurel-green/20">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-laurel-green/20">
                 <div className="mb-5">
                   <h3 className="text-lg font-semibold text-deep-bluish">Free</h3>
                   <p className="text-sm text-moderate-green/70 mt-1">
@@ -167,7 +167,7 @@ const PricingPage = () => {
               </div>
 
               {/* Pro Plan */}
-              <div className="bg-white rounded-2xl p-6 border-2 border-deep-bluish relative">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border-2 border-deep-bluish relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-deep-bluish text-white text-xs font-semibold">
                   Recommended
                 </div>

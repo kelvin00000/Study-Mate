@@ -17,6 +17,7 @@ export interface CourseTopic {
   id: string;
   title: string;
   order: number;
+  overview: string | null;
   completed: boolean;
 }
 
@@ -111,6 +112,18 @@ export const deleteTopic = (
   apiCall(`/courses/${courseId}/topics/${topicId}`, {
     method: "DELETE",
     headers: authHeaders(token),
+  });
+
+export const putTopicOverview = (
+  token: string,
+  courseId: string,
+  topicId: string,
+  overview: string,
+): Promise<{ success: boolean }> =>
+  apiCall(`/courses/${courseId}/topics/${topicId}/overview`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify({ overview }),
   });
 
 export const putReorderTopics = (

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Loader2, ChevronDown, ChevronRight,
   Trash2, Plus, Check, X, Menu,
 } from 'lucide-react';
 import { Sidebar } from '../components/dashboard/Sidebar';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
+import { QueryErrorState } from '../components/QueryErrorState';
 import { useCourse, useUpdateCourse, useDeleteCourse, useAddTopic, useUpdateTopic, useDeleteTopic, useReorderTopics } from '../hooks/useCourses';
 import { useObjectives, useAddObjective, useUpdateObjective, useDeleteObjective } from '../hooks/useObjectives';
 import type { CourseTopic } from '../api/courses';
@@ -268,13 +269,13 @@ const EditCoursePage = () => {
               <Menu size={20} />
             </button>
           </div>
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="text-5xl mb-4">🔍</div>
-            <p className="text-base font-medium mb-2 text-deep-bluish">Course not found.</p>
-            <Link to="/courses" className="text-sm font-medium hover:opacity-70 text-moderate-green">
-              Back to My Courses
-            </Link>
-          </div>
+          <QueryErrorState
+            title="Couldn't load course"
+            message="This course may not exist or the server is temporarily unavailable."
+            onRetry={() => window.location.reload()}
+            backTo="/courses"
+            backLabel="Back to My Courses"
+          />
         </div>
         <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
       </div>
@@ -292,7 +293,7 @@ const EditCoursePage = () => {
           </button>
         </div>
 
-        <main className="flex-1 p-6 lg:p-8 max-w-3xl">
+        <main className="flex-1 px-4 py-5 sm:p-6 lg:p-8 max-w-3xl">
           {/* Back */}
           <button
             className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 cursor-pointer shadow-md bg-white border border-laurel-green/30 mb-6"
@@ -306,7 +307,7 @@ const EditCoursePage = () => {
           </h1>
 
           {/* ── Section 1: Course Info ── */}
-          <section className="rounded-2xl border border-laurel-green/20 bg-white p-6 mb-6">
+          <section className="rounded-2xl border border-laurel-green/20 bg-white p-4 sm:p-6 mb-6">
             <h2 className="text-base font-semibold mb-4 text-deep-bluish">
               Course Info
             </h2>
@@ -392,7 +393,7 @@ const EditCoursePage = () => {
           </section>
 
           {/* ── Section 2: Topics ── */}
-          <section className="rounded-2xl border border-laurel-green/20 bg-white p-6 mb-6">
+          <section className="rounded-2xl border border-laurel-green/20 bg-white p-4 sm:p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-deep-bluish">
                 Topics
@@ -515,7 +516,7 @@ const EditCoursePage = () => {
           </section>
 
           {/* ── Section 3: Danger Zone ── */}
-          <section className="rounded-2xl border border-red-300 bg-white p-6">
+          <section className="rounded-2xl border border-red-300 bg-white p-4 sm:p-6">
             <h2 className="text-base font-semibold mb-1" style={{ color: '#DC2626' }}>
               Danger Zone
             </h2>

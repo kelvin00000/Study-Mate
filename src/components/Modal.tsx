@@ -28,15 +28,15 @@ const MessageModal = ({ show, setShow, message }: MessageModalProps) => {
                         exit={{ opacity: 0, y: 30, scale: 0.95 }}
                         transition={{ duration: 0.25 }}
                         className="
-                        relative w-full max-w-md
+                        relative w-full max-w-sm sm:max-w-md
                         rounded-3xl bg-white
-                        p-8 shadow-2xl
+                        p-5 sm:p-8 shadow-2xl
                         "
                     >
                         <button
                             onClick={() => setShow(false)}
                             className="
-                            absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-light-cream transition hover:bg-laurel-green/20"
+                            absolute right-4 top-4 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-light-cream transition hover:bg-laurel-green/20"
                         >
                             <X size={20} className="text-deep-bluish" />
                         </button>

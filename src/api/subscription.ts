@@ -13,6 +13,7 @@ export interface SubscriptionStatus {
   cancelledAt: string | null;
   hasPaystackSubscription: boolean;
   isTrial: boolean;
+  isEarlyAdopter: boolean;
   limits: {
     maxCourses: number | null;
     chatMessagesPerDay: number | null;

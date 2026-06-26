@@ -3,8 +3,9 @@ import { FcGoogle } from "react-icons/fc";
 import { useState } from 'react';
 import {
     BookOpen, Target, BarChart3, Sparkles, ArrowRight, CheckCircle2,
-    MessageCircle, Brain, Clock, GraduationCap, Briefcase, X,
-    TrendingUp, Shield,
+    MessageCircle, Brain, GraduationCap, X,
+    TrendingUp, Shield, AlarmClock, Puzzle, Headphones, Compass,
+    Lightbulb, Rocket,
 } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
 import { useRef, useEffect } from 'react';
@@ -89,7 +90,7 @@ const SignUpPage = () => {
 
     return (
         <>
-            <title>StudyMate - Your Smart Study Companion</title>
+            <title>StudyMate - Understand Any Concept in Minutes</title>
 
             <div className="min-h-screen bg-light-cream font-normal">
                 {/* Nav */}
@@ -97,7 +98,7 @@ const SignUpPage = () => {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: 'easeOut' }}
-                    className="flex items-center justify-between px-6 lg:px-16 py-5"
+                    className="flex items-center justify-between px-4 sm:px-6 lg:px-16 py-5"
                 >
                     <div className="flex items-center gap-3">
                         <img src="/logo.png" className="w-11 h-11 rounded-[12px]" alt="StudyMate" />
@@ -115,7 +116,7 @@ const SignUpPage = () => {
                 </motion.nav>
 
                 {/* Hero */}
-                <section className="px-6 lg:px-16 pt-12 lg:pt-20 pb-16 lg:pb-24">
+                <section className="px-4 sm:px-6 lg:px-16 pt-12 lg:pt-20 pb-16 lg:pb-24">
                     <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 max-w-6xl mx-auto">
                         <div className="flex-1 text-center lg:text-left">
                             <motion.div
@@ -126,17 +127,17 @@ const SignUpPage = () => {
                                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-moderate-green/10 text-moderate-green text-xs font-semibold mb-6"
                             >
                                 <Sparkles size={13} />
-                                Smart Study Companion
+                                Understand anything in minutes
                             </motion.div>
                             <motion.h1
                                 variants={fadeUp}
                                 initial="hidden"
                                 animate="visible"
                                 custom={0.1}
-                                className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold text-deep-bluish leading-tight mb-4"
+                                className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-bold text-deep-bluish leading-tight mb-4"
                             >
-                                Learn Smarter,{' '}
-                                <span className="text-moderate-green">Not Harder.</span>
+                                Learn Smarter.{' '}
+                                <span className="text-moderate-green">Understand Faster.</span>
                             </motion.h1>
                             <motion.p
                                 variants={fadeUp}
@@ -145,8 +146,8 @@ const SignUpPage = () => {
                                 custom={0.2}
                                 className="text-base lg:text-lg text-laurel-green max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed"
                             >
-                                Create personalized courses, get guided explanations, track your progress,
-                                and master any subject at your own pace.
+                                Stop spending hours confused. StudyMate breaks down any course or concept
+                                into bite-sized conversations so you actually understand it — fast.
                             </motion.p>
 
                             <motion.div
@@ -172,19 +173,19 @@ const SignUpPage = () => {
                                 initial="hidden"
                                 animate="visible"
                                 custom={0.4}
-                                className="flex items-center gap-5 mt-6 justify-center lg:justify-start text-xs text-laurel-green"
+                                className="flex flex-wrap items-center gap-x-4 gap-y-1.5 sm:gap-5 mt-6 justify-center lg:justify-start text-xs text-laurel-green"
                             >
                                 <span className="flex items-center gap-1.5">
                                     <CheckCircle2 size={13} className="text-moderate-green" />
-                                    Setup in 30 seconds
+                                    Ready in 30 seconds
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <CheckCircle2 size={13} className="text-moderate-green" />
-                                    Learn any subject
+                                    Grasp concepts fast
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <CheckCircle2 size={13} className="text-moderate-green" />
-                                    Track your progress
+                                    Prove you understand
                                 </span>
                             </motion.div>
                         </div>
@@ -210,13 +211,13 @@ const SignUpPage = () => {
                 </section>
 
                 {/* Pain Points */}
-                <section className="px-6 lg:px-16 py-16 lg:py-24 bg-white">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-24 bg-white">
                     <div className="max-w-6xl mx-auto">
                         <motion.div
                             variants={fadeUp}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             custom={0}
                             className="text-center mb-14"
                         >
@@ -224,7 +225,7 @@ const SignUpPage = () => {
                                 Sound familiar?
                             </h2>
                             <p className="text-sm text-laurel-green max-w-md mx-auto">
-                                You're not alone. These are the struggles that hold most students back.
+                                You're not alone. Most learners waste hours trying to understand things that should take minutes.
                             </p>
                         </motion.div>
 
@@ -232,44 +233,40 @@ const SignUpPage = () => {
                             variants={staggerContainer}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto"
                         >
                             {[
                                 {
-                                    icon: Clock,
-                                    title: 'Too much to study, too little time',
-                                    quote: '"I have 3 exams this week and I haven\'t even started..."',
-                                    color: '#B45309',
-                                    bg: 'bg-amber-50',
+                                    icon: AlarmClock,
+                                    title: 'Hours wasted, nothing retained',
+                                    quote: '"I studied for 4 hours and still can\'t explain the concept..."',
+                                    color: '#8B6914',
                                 },
                                 {
-                                    icon: Brain,
+                                    icon: Puzzle,
                                     title: 'Read it. Forgot it.',
                                     quote: '"I spent hours reading but can\'t remember anything the next day."',
-                                    color: '#7C3AED',
-                                    bg: 'bg-violet-50',
+                                    color: '#5B4A8A',
                                 },
                                 {
-                                    icon: MessageCircle,
+                                    icon: Headphones,
                                     title: 'Stuck with no help',
                                     quote: '"It\'s 11pm and I can\'t figure this out. Who do I ask?"',
-                                    color: '#0D3A35',
-                                    bg: 'bg-emerald-50',
+                                    color: '#2D6A5E',
                                 },
                                 {
-                                    icon: Target,
+                                    icon: Compass,
                                     title: 'No structure, no direction',
                                     quote: '"I want to learn this topic but I don\'t know where to start."',
-                                    color: '#DC2626',
-                                    bg: 'bg-red-50',
+                                    color: '#9A5247',
                                 },
                             ].map((p) => (
                                 <motion.div
                                     key={p.title}
                                     variants={staggerChild}
                                     whileHover={{ y: -4, scale: 1.02 }}
-                                    className={`${p.bg} rounded-2xl p-6 border border-transparent hover:border-gray-200 transition-all`}
+                                    className="bg-light-cream rounded-2xl p-6 border border-transparent hover:border-gray-200 transition-all"
                                 >
                                     <div
                                         className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
@@ -287,30 +284,30 @@ const SignUpPage = () => {
                             variants={fadeUp}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             custom={0.3}
                             className="text-center mt-10 text-sm font-semibold text-moderate-green"
                         >
-                            StudyMate was built to fix all of this.
+                            What if you could understand any concept in minutes instead?
                         </motion.p>
                     </div>
                 </section>
 
                 {/* Features */}
-                <section className="px-6 lg:px-16 py-16 lg:py-24">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-24">
                     <div className="max-w-6xl mx-auto">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             transition={{ duration: 0.6, ease: 'easeOut' }}
                             className="text-center mb-14"
                         >
                             <h2 className="text-2xl sm:text-3xl font-bold text-deep-bluish mb-3">
-                                Everything you need to excel
+                                From confused to confident in minutes
                             </h2>
                             <p className="text-sm text-laurel-green max-w-md mx-auto">
-                                Powerful tools designed to make your study sessions more effective and engaging.
+                                Every feature is designed to help you grasp concepts quickly and prove you understand them.
                             </p>
                         </motion.div>
 
@@ -318,32 +315,32 @@ const SignUpPage = () => {
                             variants={staggerContainer}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
                         >
                             {[
                                 {
                                     icon: BookOpen,
                                     title: 'Instant Course Creation',
-                                    desc: 'Generate structured courses on any topic in seconds.',
+                                    desc: 'Type a topic and get a full structured course in seconds — ready to learn.',
                                     color: '#276152',
                                 },
                                 {
                                     icon: Sparkles,
-                                    title: 'Interactive Tutor',
-                                    desc: 'Chat with a tutor that adapts to your learning style.',
+                                    title: 'AI Tutor That Explains It Right',
+                                    desc: 'Have a conversation and understand concepts the way your brain needs to hear them.',
                                     color: '#0D3A35',
                                 },
                                 {
                                     icon: Target,
-                                    title: 'Learning Objectives',
-                                    desc: 'Track what you\'ve learned with auto-evaluated objectives.',
+                                    title: 'Know When You Get It',
+                                    desc: 'Objectives light up as you demonstrate understanding — no guessing if you\'re ready.',
                                     color: '#276152',
                                 },
                                 {
                                     icon: BarChart3,
-                                    title: 'Progress Tracking',
-                                    desc: 'Streaks, XP, and leaderboards to keep you motivated.',
+                                    title: 'Stay Motivated Daily',
+                                    desc: 'Streaks, XP, and leaderboards make every minute of learning count.',
                                     color: '#0D3A35',
                                 },
                             ].map((f) => (
@@ -368,21 +365,21 @@ const SignUpPage = () => {
                 </section>
 
                 {/* Why StudyMate */}
-                <section className="px-6 lg:px-16 py-16 lg:py-24 bg-white">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-24 bg-white">
                     <div className="max-w-6xl mx-auto">
                         <motion.div
                             variants={fadeUp}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             custom={0}
                             className="text-center mb-14"
                         >
                             <h2 className="text-2xl sm:text-3xl font-bold text-deep-bluish mb-3">
-                                Why students love StudyMate
+                                Why it clicks so fast
                             </h2>
                             <p className="text-sm text-laurel-green max-w-lg mx-auto">
-                                It's not just another study tool. It's a complete learning system designed around how you actually learn.
+                                StudyMate is built around how your brain actually learns — so concepts stick in minutes, not days.
                             </p>
                         </motion.div>
 
@@ -391,29 +388,29 @@ const SignUpPage = () => {
                                 variants={slideInLeft}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
+                                viewport={{ once: false, amount: 0.2 }}
                                 className="space-y-6"
                             >
                                 {[
                                     {
                                         icon: Brain,
-                                        title: 'Built around how your brain works',
-                                        desc: 'Active recall through conversation, spaced practice with quizzes, and objective tracking ensure you actually retain what you learn — not just read it.',
+                                        title: 'Conversation beats textbooks',
+                                        desc: 'You learn by talking through concepts, not passively reading. A few minutes of back-and-forth beats hours of highlighting.',
                                     },
                                     {
                                         icon: TrendingUp,
-                                        title: 'See your progress in real time',
-                                        desc: 'Learning objectives light up as you master them. Streaks and XP keep you motivated. You always know exactly where you stand.',
+                                        title: 'See understanding happen in real time',
+                                        desc: 'Objectives light up as you grasp each concept. You can literally watch yourself go from confused to confident.',
                                     },
                                     {
                                         icon: MessageCircle,
-                                        title: 'Get unstuck instantly',
-                                        desc: 'Stuck on a concept at midnight? Your tutor is always available to explain, simplify, and guide you through tough topics.',
+                                        title: 'Get unstuck in seconds, not hours',
+                                        desc: 'Confused at midnight? Ask your AI tutor. It breaks down the concept until it makes sense — no waiting, no judgment.',
                                     },
                                     {
                                         icon: Shield,
-                                        title: 'Learn at your own pace, judgment-free',
-                                        desc: 'No embarrassing questions. No falling behind. Ask anything, revisit topics as many times as you need, and move at your speed.',
+                                        title: 'Your pace, your way',
+                                        desc: 'Some concepts take 2 minutes, some take 10. No pressure, no embarrassing questions — just understanding at your speed.',
                                     },
                                 ].map((b) => (
                                     <motion.div
@@ -437,7 +434,7 @@ const SignUpPage = () => {
                                 variants={slideInRight}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
+                                viewport={{ once: false, amount: 0.2 }}
                                 className="relative"
                             >
                                 <div className="absolute -inset-6 bg-moderate-green/5 rounded-3xl blur-2xl" />
@@ -454,14 +451,14 @@ const SignUpPage = () => {
                 </section>
 
                 {/* How it works */}
-                <section className="px-6 lg:px-16 py-16 lg:py-24">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-24">
                     <div className="max-w-6xl mx-auto">
                         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                             <motion.div
                                 variants={slideInLeft}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
+                                viewport={{ once: false, amount: 0.2 }}
                                 className="flex-1 max-w-sm"
                             >
                                 <div className="relative">
@@ -477,7 +474,7 @@ const SignUpPage = () => {
                                 <motion.h2
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
+                                    viewport={{ once: false, amount: 0.2 }}
                                     transition={{ duration: 0.5, ease: 'easeOut' }}
                                     className="text-2xl sm:text-3xl font-bold text-deep-bluish mb-8 text-center lg:text-left"
                                 >
@@ -487,14 +484,14 @@ const SignUpPage = () => {
                                     variants={staggerContainer}
                                     initial="hidden"
                                     whileInView="visible"
-                                    viewport={{ once: true }}
+                                    viewport={{ once: false, amount: 0.2 }}
                                     className="space-y-6"
                                 >
                                     {[
-                                        { step: '01', title: 'Create a course', desc: 'Tell us what you want to learn and get a structured course with topics in seconds.' },
-                                        { step: '02', title: 'Learn through conversation', desc: 'Chat your way through each topic. Your understanding is tracked in real time.' },
-                                        { step: '03', title: 'Take quizzes', desc: 'Test your knowledge with tailored quizzes. Score 80% to unlock the next topic.' },
-                                        { step: '04', title: 'Level up', desc: 'Earn XP, build streaks, and climb the leaderboard as you master new subjects.' },
+                                        { step: '01', title: 'Pick any topic', desc: 'Type what you want to understand — from "blockchain" to "organic chemistry" — and get a structured course instantly.' },
+                                        { step: '02', title: 'Talk it out with AI', desc: 'Chat through each concept one by one. In minutes, not hours, you\'ll actually get it.' },
+                                        { step: '03', title: 'Prove you understand', desc: 'Take a quick quiz to confirm mastery. Score 80% and you\'re ready to move on.' },
+                                        { step: '04', title: 'Keep the momentum', desc: 'Earn XP, build streaks, and watch yourself go from beginner to confident — topic by topic.' },
                                     ].map((s) => (
                                         <motion.div key={s.step} variants={staggerChild} whileHover={{ x: 8 }} className="flex gap-5 cursor-default">
                                             <div className="shrink-0 w-10 h-10 rounded-xl bg-moderate-green flex items-center justify-center text-white text-xs font-bold">
@@ -513,13 +510,13 @@ const SignUpPage = () => {
                 </section>
 
                 {/* Who it's for */}
-                <section className="px-6 lg:px-16 py-16 lg:py-24 bg-white">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-24 bg-white">
                     <div className="max-w-6xl mx-auto">
                         <motion.div
                             variants={fadeUp}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             custom={0}
                             className="text-center mb-14"
                         >
@@ -535,43 +532,53 @@ const SignUpPage = () => {
                             variants={staggerContainer}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
                         >
                             {[
                                 {
                                     icon: GraduationCap,
                                     title: 'Students',
-                                    desc: 'Ace your courses with structured study paths and on-demand help for any subject.',
-                                    benefits: ['Exam preparation', 'Course review', 'Concept clarity'],
+                                    desc: 'Finally understand that lecture topic in minutes instead of re-reading slides for hours.',
+                                    benefits: ['Exam prep', 'Quick concept review', 'Instant clarity'],
+                                    color: '#2D6A5E',
                                 },
                                 {
-                                    icon: Brain,
+                                    icon: Lightbulb,
                                     title: 'Self-learners',
-                                    desc: 'Pick up any skill or topic on your own terms, with a system that keeps you on track.',
-                                    benefits: ['New skills', 'Career pivots', 'Curiosity-driven'],
+                                    desc: 'Curious about something new? Go from zero to solid understanding in one focused session.',
+                                    benefits: ['New skills', 'Quick deep-dives', 'Curiosity-driven'],
+                                    color: '#8B6914',
                                 },
                                 {
-                                    icon: Briefcase,
+                                    icon: Rocket,
                                     title: 'Professionals',
-                                    desc: 'Stay sharp and grow your expertise with focused, bite-sized learning sessions.',
-                                    benefits: ['Upskilling', 'Certifications', 'Industry knowledge'],
+                                    desc: 'Need to understand a new framework or concept for work? Get up to speed in minutes, not days.',
+                                    benefits: ['Rapid upskilling', 'Certifications', 'Stay current'],
+                                    color: '#5B4A8A',
                                 },
                             ].map((p) => (
                                 <motion.div
                                     key={p.title}
                                     variants={staggerChild}
                                     whileHover={{ y: -6, scale: 1.02 }}
-                                    className="p-7 rounded-2xl bg-light-cream/60 border border-laurel-green/20 hover:border-moderate-green/40 transition-all hover:shadow-lg group"
+                                    className="p-7 rounded-2xl bg-light-cream border border-transparent hover:border-gray-200 transition-all hover:shadow-lg group"
                                 >
-                                    <div className="w-12 h-12 rounded-xl bg-moderate-green/10 flex items-center justify-center mb-5 group-hover:bg-moderate-green/20 transition-colors">
-                                        <p.icon size={24} className="text-moderate-green" />
+                                    <div
+                                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-colors"
+                                        style={{ backgroundColor: p.color + '18' }}
+                                    >
+                                        <p.icon size={24} style={{ color: p.color }} />
                                     </div>
                                     <h3 className="font-bold text-deep-bluish text-base mb-2">{p.title}</h3>
                                     <p className="text-xs text-laurel-green leading-relaxed mb-4">{p.desc}</p>
                                     <div className="flex flex-wrap gap-2">
                                         {p.benefits.map((b) => (
-                                            <span key={b} className="text-[11px] px-2.5 py-1 rounded-full bg-moderate-green/10 text-moderate-green font-medium">
+                                            <span
+                                                key={b}
+                                                className="text-[11px] px-2.5 py-1 rounded-full font-medium"
+                                                style={{ backgroundColor: p.color + '14', color: p.color }}
+                                            >
                                                 {b}
                                             </span>
                                         ))}
@@ -583,21 +590,21 @@ const SignUpPage = () => {
                 </section>
 
                 {/* Old vs New */}
-                <section className="px-6 lg:px-16 py-16 lg:py-24">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-24">
                     <div className="max-w-4xl mx-auto">
                         <motion.div
                             variants={fadeUp}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true }}
+                            viewport={{ once: false, amount: 0.2 }}
                             custom={0}
                             className="text-center mb-12"
                         >
                             <h2 className="text-2xl sm:text-3xl font-bold text-deep-bluish mb-3">
-                                The old way vs. the StudyMate way
+                                Hours of confusion vs. minutes of clarity
                             </h2>
                             <p className="text-sm text-laurel-green max-w-md mx-auto">
-                                See how StudyMate transforms the way you study.
+                                See the difference when learning is designed around understanding, not just reading.
                             </p>
                         </motion.div>
 
@@ -606,8 +613,8 @@ const SignUpPage = () => {
                                 variants={slideInLeft}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
-                                className="bg-red-50/80 rounded-2xl p-7 border border-red-100"
+                                viewport={{ once: false, amount: 0.2 }}
+                                className="bg-light-cream rounded-2xl p-7 border border-laurel-green/20"
                             >
                                 <div className="flex items-center gap-2 mb-5">
                                     <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
@@ -617,11 +624,11 @@ const SignUpPage = () => {
                                 </div>
                                 <ul className="space-y-3">
                                     {[
-                                        'Scattered notes across apps and notebooks',
-                                        'Hours of passive reading and highlighting',
-                                        'No way to know if you actually understood',
-                                        'Stuck at midnight with no one to ask',
-                                        'Cramming before exams with no structure',
+                                        'Spend hours reading without understanding',
+                                        'Re-watch lectures hoping it clicks eventually',
+                                        'No way to know if you actually get it',
+                                        'Stuck for hours with no one to explain',
+                                        'Cram for days and still feel unprepared',
                                     ].map((item) => (
                                         <li key={item} className="flex items-start gap-2.5 text-sm text-laurel-green">
                                             <X size={14} className="text-red-400 shrink-0 mt-0.5" />
@@ -635,8 +642,8 @@ const SignUpPage = () => {
                                 variants={slideInRight}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
-                                className="bg-emerald-50/80 rounded-2xl p-7 border border-emerald-100"
+                                viewport={{ once: false, amount: 0.2 }}
+                                className="bg-light-cream rounded-2xl p-7 border border-laurel-green/20"
                             >
                                 <div className="flex items-center gap-2 mb-5">
                                     <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
@@ -646,11 +653,11 @@ const SignUpPage = () => {
                                 </div>
                                 <ul className="space-y-3">
                                     {[
-                                        'Organized courses with clear topic breakdowns',
-                                        'Active learning through conversation',
-                                        'Real-time objective tracking shows mastery',
-                                        'A tutor available 24/7 for any question',
-                                        'Structured paths with quizzes to prove readiness',
+                                        'Understand any concept through a quick conversation',
+                                        'Grasp topics in minutes, not hours',
+                                        'Objectives confirm you actually understand',
+                                        'AI tutor explains it until it clicks',
+                                        'Quizzes prove you\'re ready to move on',
                                     ].map((item) => (
                                         <li key={item} className="flex items-start gap-2.5 text-sm text-deep-bluish">
                                             <CheckCircle2 size={14} className="text-moderate-green shrink-0 mt-0.5" />
@@ -664,18 +671,18 @@ const SignUpPage = () => {
                 </section>
 
                 {/* Stats Banner */}
-                <section className="px-6 lg:px-16 py-14 bg-deep-bluish">
+                <section className="px-4 sm:px-6 lg:px-16 py-14 bg-deep-bluish">
                     <motion.div
                         variants={staggerContainer}
                         initial="hidden"
                         whileInView="visible"
-                        viewport={{ once: true }}
-                        className="max-w-4xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8 text-center"
+                        viewport={{ once: false, amount: 0.2 }}
+                        className="max-w-4xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 text-center"
                     >
                         {[
                             { value: 500, suffix: '+', label: 'Students learning' },
                             { value: 1200, suffix: '+', label: 'Courses created' },
-                            { value: 5000, suffix: '+', label: 'Study sessions' },
+                            { value: 5000, suffix: '+', label: 'Concepts understood' },
                             { value: 10, suffix: '+', label: 'Countries' },
                         ].map((s) => (
                             <motion.div key={s.label} variants={staggerChild}>
@@ -689,13 +696,13 @@ const SignUpPage = () => {
                 </section>
 
                 {/* CTA */}
-                <section className="px-6 lg:px-16 py-16 lg:py-20">
+                <section className="px-4 sm:px-6 lg:px-16 py-16 lg:py-20">
                     <motion.div
                         variants={scaleIn}
                         initial="hidden"
                         whileInView="visible"
-                        viewport={{ once: true }}
-                        className="max-w-3xl mx-auto text-center bg-deep-bluish rounded-3xl px-8 py-14 lg:py-16 relative overflow-hidden"
+                        viewport={{ once: false, amount: 0.2 }}
+                        className="max-w-3xl mx-auto text-center bg-deep-bluish rounded-3xl px-5 py-10 sm:px-8 sm:py-14 lg:py-16 relative overflow-hidden"
                     >
                         <div className="absolute inset-0 opacity-10">
                             <div className="absolute top-6 left-10 w-20 h-20 rounded-full border-2 border-white" />
@@ -707,21 +714,21 @@ const SignUpPage = () => {
                                 variants={fadeUp}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
+                                viewport={{ once: false, amount: 0.2 }}
                                 custom={0.1}
                                 className="text-2xl sm:text-3xl font-bold text-white mb-3"
                             >
-                                Your next study session can be smarter
+                                Understand your next concept in minutes
                             </motion.h2>
                             <motion.p
                                 variants={fadeUp}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
+                                viewport={{ once: false, amount: 0.2 }}
                                 custom={0.2}
                                 className="text-sm text-laurel-green mb-8 max-w-md mx-auto"
                             >
-                                Join hundreds of students who've already transformed the way they learn. It only takes a few seconds.
+                                Join hundreds of students who stopped wasting hours and started actually understanding. It takes 30 seconds to start.
                             </motion.p>
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
@@ -740,7 +747,7 @@ const SignUpPage = () => {
                 <motion.footer
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: false, amount: 0.2 }}
                     transition={{ duration: 0.5 }}
                     className="px-6 lg:px-16 py-8 border-t border-laurel-green/20"
                 >
@@ -750,7 +757,7 @@ const SignUpPage = () => {
                             <span className="font-semibold text-sm text-deep-bluish">Study Mate</span>
                         </div>
                         <p className="text-xs text-laurel-green">
-                            Built to help you learn better.
+                            Understand anything. In minutes.
                         </p>
                     </div>
                 </motion.footer>

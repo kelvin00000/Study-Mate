@@ -36,9 +36,13 @@ export function useTopicChat() {
     const decoder = new TextDecoder();
     let fullText = "";
     let buffer = "";
+    const STREAM_TIMEOUT = 60_000; // 60s max silence between chunks
 
     while (true) {
-      const { done, value } = await reader.read();
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Stream timeout — no data received")), STREAM_TIMEOUT)
+      );
+      const { done, value } = await Promise.race([reader.read(), timeout]);
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });

@@ -13,13 +13,14 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
+import { useAuth } from "@clerk/clerk-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import { Sidebar } from "../components/dashboard/Sidebar";
 import { CreateCourseModal } from "../components/dashboard/CreateCourseModal";
 import { useCourse } from "../hooks/useCourses";
 import { useTopicChat, type Message } from "../hooks/useTopicChat";
-import { getOverview } from "../lib/overviewCache";
+import { putTopicOverview } from "../api/courses";
 import {
   useObjectives,
   useGenerateObjectives,
@@ -99,6 +100,7 @@ const TopicChatPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const { getToken } = useAuth();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -249,17 +251,14 @@ const TopicChatPage = () => {
   );
 
   // ── Overview seed ─────────────────────────────────────────────────────────
-  // Read cached overview synchronously during render (localStorage is sync)
+  // Read overview from DB (returned with course data) or stream on first visit
   const seededRef = useRef(false);
-  if (course && topic && !seededRef.current) {
-    const cached = getOverview(course.id, topic.id);
-    if (cached) {
-      seededRef.current = true;
-      if (!overview) setOverview(cached);
-    }
+  if (course && topic && !seededRef.current && topic.overview) {
+    seededRef.current = true;
+    if (!overview) setOverview(topic.overview);
   }
 
-  // Stream overview only when not in localStorage (first visit)
+  // Stream overview only when not in DB (first visit)
   useEffect(() => {
     if (!course || !topicName || !topic || seededRef.current) return;
     seededRef.current = true;
@@ -277,12 +276,34 @@ const TopicChatPage = () => {
         accumulated += delta;
         setOverview(accumulated);
       },
-      (fullText) => {
+      async (fullText) => {
         setOverview(fullText);
         setOverviewStreaming(false);
+        // Save overview to DB so it doesn't regenerate
+        try {
+          const token = await getToken();
+          if (token) {
+            await putTopicOverview(token, course.id, topic.id, fullText);
+            // Update cached course data so next visit reads from DB
+            queryClient.setQueryData(
+              ["course", course.id],
+              (prev: typeof course | undefined) => {
+                if (!prev) return prev;
+                return {
+                  ...prev,
+                  topics: prev.topics.map((t) =>
+                    t.id === topic.id ? { ...t, overview: fullText } : t,
+                  ),
+                };
+              },
+            );
+          }
+        } catch {
+          // Saving failed — overview will regenerate next visit, non-critical
+        }
       },
     ).catch(() => setOverviewStreaming(false));
-  }, [course, topicName, topic, sendMessage]);
+  }, [course, topicName, topic, sendMessage, getToken, queryClient]);
 
   // ── Evaluate objectives ───────────────────────────────────────────────────
   const runEvaluate = useCallback(

@@ -16,6 +16,7 @@ export function  TopBar({ onMenuToggle, showSearch = false, searchValue, onSearc
             {/* Mobile hamburger */}
             <button
                 onClick={onMenuToggle}
+                aria-label="Toggle menu"
                 className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
             >
                 <Menu size={20} />
@@ -41,7 +42,7 @@ export function  TopBar({ onMenuToggle, showSearch = false, searchValue, onSearc
              
                 {/* Notification icons */}
                 <div className="flex items-center lg:pl-3 border-l border-l-laurel-green/20">
-                     <button className="p-2 mr-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer">
+                     <button aria-label="Notifications" className="p-2 mr-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer">
                         <Bell size={18} />
                     </button>
 

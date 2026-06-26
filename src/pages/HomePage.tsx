@@ -10,7 +10,9 @@ import { CourseCard } from '../components/dashboard/CourseCard';
 import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
 import { LeaderboardModal } from '../components/streak/LeaderboardModal';
 import { StreakMilestoneToast } from '../components/streak/StreakMilestoneToast';
+import WelcomeTrialModal from '../components/dashboard/WelcomeTrialModal';
 import { useCourses } from '../hooks/useCourses';
+import { useSubscription } from '../hooks/useSubscription';
 
 const HomePage = () => {
   const { user } = useUser();
@@ -18,7 +20,17 @@ const HomePage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [activeMilestone, setActiveMilestone] = useState<7 | 30 | 100 | null>(null);
+  const [welcomeModalOpen] = useState(() => {
+    const flag = sessionStorage.getItem("sm:justOnboarded");
+    if (flag) {
+      sessionStorage.removeItem("sm:justOnboarded");
+      return true;
+    }
+    return false;
+  });
+  const [welcomeModalVisible, setWelcomeModalVisible] = useState(welcomeModalOpen);
   const { data: courses = [], isLoading } = useCourses();
+  const { data: subscription } = useSubscription();
 
   const recentCourses = courses.slice(0, 3);
 
@@ -40,7 +52,7 @@ const HomePage = () => {
           {/* Welcome + Streak */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-8 lg:h-[40%]">
             <div className='self-center mt-4 lg:mt-0 lg:w-[60%]'>
-              <h1 className="text-2xl lg:text-3xl text-deep-bluish mb-1 font-semibold">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl text-deep-bluish mb-1 font-semibold">
                 Welcome back, {user?.firstName ?? 'Learner'}.
               </h1>
               <p className="text-sm text-muted">
@@ -139,7 +151,7 @@ const HomePage = () => {
                   </span>
                 </div>
                 <h3
-                  className="text-xl font-bold mb-1"
+                  className="text-lg sm:text-xl font-bold mb-1"
                 >
                   Data Structures & Algorithms
                 </h3>
@@ -160,6 +172,14 @@ const HomePage = () => {
 
       <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
       <LeaderboardModal open={leaderboardOpen} onClose={() => setLeaderboardOpen(false)} />
+      {subscription && (
+        <WelcomeTrialModal
+          show={welcomeModalVisible}
+          onClose={() => setWelcomeModalVisible(false)}
+          isEarlyAdopter={subscription.isEarlyAdopter}
+          trialEndDate={subscription.currentPeriodEnd}
+        />
+      )}
       <AnimatePresence>
         {activeMilestone && (
           <StreakMilestoneToast

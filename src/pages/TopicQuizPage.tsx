@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
+import { ServerErrorScreen } from "../components/ServerErrorScreen";
 import { useCourse, useCompleteTopic } from "../hooks/useCourses";
 import { useGenerateQuiz } from "../hooks/useQuiz";
 import { MarkdownMessage } from "../components/MarkdownMessage";
@@ -28,6 +29,13 @@ const TopicQuizPage = () => {
   const courseTitle: string = location.state?.courseTitle ?? "";
   const topicTitle: string = location.state?.topicTitle ?? "";
   const stateColor: string = location.state?.courseColor ?? "";
+
+  // If state is missing (e.g. page refresh/direct nav), redirect back to topic chat
+  useEffect(() => {
+    if (!location.state?.topicId) {
+      navigate(`/courses/${courseId}/topics/${topicIndex}`, { replace: true });
+    }
+  }, [location.state, courseId, topicIndex, navigate]);
 
   // useCourse loads in parallel — only needed for result screen UI
   const { data: course } = useCourse(courseId);
@@ -89,23 +97,15 @@ const TopicQuizPage = () => {
   // ── Error screen ───────────────────────────────────────────────────────────
   if (phase === "error") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-light-cream">
-        <div className="text-center max-w-xs px-4">
-          <p className="text-3xl mb-4">⚠️</p>
-          <p className="text-base font-semibold mb-1 text-deep-bluish">
-            Quiz generation failed
-          </p>
-          <p className="text-sm mb-6 text-moderate-green/70">
-            The AI took too long to respond. Please go back and try again.
-          </p>
-          <button
-            onClick={() => navigate(`/courses/${courseId}/topics/${topicIndex}`)}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-deep-bluish"
-          >
-            ← Back to Topic
-          </button>
-        </div>
-      </div>
+      <ServerErrorScreen
+        title="Quiz generation failed"
+        message="The AI took too long to respond or something went wrong. Please go back and try again."
+        onRetry={() => {
+          generatedRef.current = false;
+          setPhase("generating");
+        }}
+        onGoHome={() => navigate(`/courses/${courseId}/topics/${topicIndex}`)}
+      />
     );
   }
 
@@ -134,7 +134,7 @@ const TopicQuizPage = () => {
 
     return (
       <div className="min-h-screen bg-light-cream">
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-3 py-6 sm:px-4 sm:py-8">
           <button
             className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 cursor-pointer shadow-md bg-white border border-laurel-green/30 mb-8"
             onClick={() => navigate(`/courses/${courseId}/topics/${topicIndex}`)}
@@ -144,8 +144,8 @@ const TopicQuizPage = () => {
 
           {/* Progress header */}
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-lg font-bold text-deep-bluish">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
+              <h1 className="text-base sm:text-lg font-bold text-deep-bluish">
                 Quiz — {topicTitle}
               </h1>
               <span className="text-sm text-moderate-green/70">
@@ -161,7 +161,7 @@ const TopicQuizPage = () => {
           </div>
 
           {/* Question card */}
-          <div className="rounded-2xl border border-laurel-green/20 bg-white p-6 mb-5">
+          <div className="rounded-2xl border border-laurel-green/20 bg-white p-4 sm:p-6 mb-5">
             <div className="mb-5">
               <MarkdownMessage content={question.question} />
             </div>
@@ -231,9 +231,9 @@ const TopicQuizPage = () => {
         </button>
 
         {/* Score card */}
-        <div className="rounded-2xl border border-laurel-green/20 bg-white p-8 mb-6 text-center">
+        <div className="rounded-2xl border border-laurel-green/20 bg-white p-5 sm:p-8 mb-6 text-center">
           <div className="text-5xl mb-3">{passed ? "🎉" : "💪"}</div>
-          <h1 className="text-2xl font-bold mb-2 text-deep-bluish">
+          <h1 className="text-xl sm:text-2xl font-bold mb-2 text-deep-bluish">
             {passed ? "Great work!" : "Keep going!"}
           </h1>
           <p className="text-sm text-moderate-green/70">
@@ -284,7 +284,7 @@ const TopicQuizPage = () => {
         )}
 
         {/* Action buttons */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           {passed ? (
             <button
               onClick={handleMarkComplete}
