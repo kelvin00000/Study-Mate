@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { ArrowRight, BookOpen, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { CreateCourseModal } from '../components/dashboard/CreateCourseModal';
 import { LeaderboardModal } from '../components/streak/LeaderboardModal';
 import { StreakMilestoneToast } from '../components/streak/StreakMilestoneToast';
 import WelcomeTrialModal from '../components/dashboard/WelcomeTrialModal';
+import RenewalPromptModal from '../components/dashboard/RenewalPromptModal';
 import { useCourses } from '../hooks/useCourses';
 import { useSubscription } from '../hooks/useSubscription';
 
@@ -29,8 +30,20 @@ const HomePage = () => {
     return false;
   });
   const [welcomeModalVisible, setWelcomeModalVisible] = useState(welcomeModalOpen);
+  const [renewalModalOpen, setRenewalModalOpen] = useState(false);
   const { data: courses = [], isLoading } = useCourses();
   const { data: subscription } = useSubscription();
+
+  useEffect(() => {
+    if (
+      subscription?.isOneTimePayment &&
+      subscription.renewalDueInDays !== null &&
+      subscription.renewalDueInDays <= 3 &&
+      !sessionStorage.getItem("renewal_dismissed")
+    ) {
+      setRenewalModalOpen(true);
+    }
+  }, [subscription]);
 
   const recentCourses = courses.slice(0, 3);
 
@@ -173,12 +186,22 @@ const HomePage = () => {
       <CreateCourseModal open={modalOpen} onClose={() => setModalOpen(false)} />
       <LeaderboardModal open={leaderboardOpen} onClose={() => setLeaderboardOpen(false)} />
       {subscription && (
-        <WelcomeTrialModal
-          show={welcomeModalVisible}
-          onClose={() => setWelcomeModalVisible(false)}
-          isEarlyAdopter={subscription.isEarlyAdopter}
-          trialEndDate={subscription.currentPeriodEnd}
-        />
+        <>
+          <WelcomeTrialModal
+            show={welcomeModalVisible}
+            onClose={() => setWelcomeModalVisible(false)}
+            isEarlyAdopter={subscription.isEarlyAdopter}
+            trialEndDate={subscription.currentPeriodEnd}
+          />
+          {subscription.isOneTimePayment && subscription.renewalDueInDays !== null && subscription.currentPeriodEnd && (
+            <RenewalPromptModal
+              show={renewalModalOpen}
+              onClose={() => setRenewalModalOpen(false)}
+              daysRemaining={subscription.renewalDueInDays}
+              expiryDate={subscription.currentPeriodEnd}
+            />
+          )}
+        </>
       )}
       <AnimatePresence>
         {activeMilestone && (

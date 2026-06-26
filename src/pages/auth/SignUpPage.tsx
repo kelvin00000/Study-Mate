@@ -101,7 +101,7 @@ const SignUpPage = () => {
                     className="flex items-center justify-between px-4 sm:px-6 lg:px-16 py-5"
                 >
                     <div className="flex items-center gap-3">
-                        <img src="/logo.png" className="w-11 h-11 rounded-[12px]" alt="StudyMate" />
+                        <img src="/logo.png" className="w-11 h-11 rounded-xl" alt="StudyMate" />
                         <span className="font-bold text-lg text-deep-bluish">Study Mate</span>
                     </div>
                     <motion.button

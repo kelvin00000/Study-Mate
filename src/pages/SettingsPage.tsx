@@ -159,9 +159,7 @@ const SettingsPage = () => {
                       {subscription.plan === 'pro'
                         ? subscription.isTrial
                           ? 'Pro (Trial)'
-                          : subscription.hasPaystackSubscription
-                            ? 'Pro'
-                            : 'Pro (Lifetime)'
+                          : 'Pro'
                         : 'Free'}
                     </span>
                     {subscription.status === 'cancelled' && subscription.currentPeriodEnd && (
@@ -181,6 +179,23 @@ const SettingsPage = () => {
                         className="inline-flex items-center gap-1.5 mt-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
                       >
                         <Crown size={14} /> Upgrade Now
+                      </Link>
+                    </div>
+                  )}
+
+                  {subscription.plan === 'pro' && subscription.isOneTimePayment && subscription.status !== 'cancelled' && (
+                    <div className="space-y-2">
+                      {subscription.currentPeriodEnd && (
+                        <p className="text-sm text-moderate-green/70">
+                          Expires: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                          {subscription.interval && ` (${subscription.interval})`}
+                        </p>
+                      )}
+                      <Link
+                        to="/pricing"
+                        className="inline-flex items-center gap-1.5 mt-1 text-sm font-semibold text-moderate-green hover:text-deep-bluish transition-colors"
+                      >
+                        <Crown size={14} /> Renew Pro
                       </Link>
                     </div>
                   )}

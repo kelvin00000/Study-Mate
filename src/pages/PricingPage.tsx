@@ -11,11 +11,11 @@ type Region = "GHS" | "INT";
 const PRICES: Record<Region, Record<Interval, { amount: string; perMonth: string; freeLabel: string }>> = {
   GHS: {
     monthly: { amount: "GHS 15", perMonth: "GHS 15/mo", freeLabel: "GHS 0" },
-    yearly: { amount: "GHS 50", perMonth: "~GHS 4.17/mo", freeLabel: "GHS 0" },
+    yearly: { amount: "GHS 100", perMonth: "~GHS 8.33/mo", freeLabel: "GHS 0" },
   },
   INT: {
     monthly: { amount: "$3", perMonth: "$3/mo", freeLabel: "$0" },
-    yearly: { amount: "$10", perMonth: "~$0.83/mo", freeLabel: "$0" },
+    yearly: { amount: "$15", perMonth: "~$1.25/mo", freeLabel: "$0" },
   },
 };
 
@@ -46,18 +46,28 @@ const PricingPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [interval, setInterval] = useState<Interval>("monthly");
   const [region, setRegion] = useState<Region>("INT");
+  const [regionLoading, setRegionLoading] = useState(true);
   const { data: subscription } = useSubscription();
   const upgrade = useInitiateUpgrade();
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("ipapi failed");
+        return res.json();
+      })
       .then((data) => {
         if (data.country_code === "GH") setRegion("GHS");
       })
-      .catch(() => {
-        // Default to INT on failure — already set
-      });
+      .catch(() =>
+        fetch("https://ipwho.is/")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.country_code === "GH") setRegion("GHS");
+          })
+          .catch(() => {})
+      )
+      .finally(() => setRegionLoading(false));
   }, []);
 
   const isPro = subscription?.plan === "pro";
@@ -122,7 +132,7 @@ const PricingPage = () => {
                   >
                     {int === "monthly" ? "Monthly" : "Yearly"}
                     {int === "yearly" && (
-                      <span className="ml-1.5 text-xs opacity-80 hidden sm:inline">Save ~70%</span>
+                      <span className="ml-1.5 text-xs opacity-80 hidden sm:inline">Save ~58%</span>
                     )}
                   </button>
                 ))}
@@ -130,6 +140,33 @@ const PricingPage = () => {
             </div>
 
             {/* Plans */}
+            {regionLoading ? (
+              <div className="grid md:grid-cols-2 gap-5 mb-10">
+                {[1, 2].map((n) => (
+                  <div
+                    key={n}
+                    className={`bg-white rounded-2xl p-4 sm:p-6 animate-pulse ${
+                      n === 2 ? "border-2 border-gray-200" : "border border-laurel-green/20"
+                    }`}
+                  >
+                    <div className="mb-5">
+                      <div className="h-5 w-16 rounded bg-gray-100 mb-2" />
+                      <div className="h-3.5 w-40 rounded bg-gray-100 mb-3" />
+                      <div className="h-8 w-24 rounded bg-gray-100" />
+                    </div>
+                    <div className="h-10 w-full rounded-xl bg-gray-100 mb-5" />
+                    <div className="space-y-3">
+                      {FEATURES.map(({ label }) => (
+                        <div key={label} className="flex items-center justify-between">
+                          <div className="h-3.5 w-28 rounded bg-gray-100" />
+                          <div className="h-3.5 w-16 rounded bg-gray-100" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
             <div className="grid md:grid-cols-2 gap-5 mb-10">
               {/* Free Plan */}
               <div className="bg-white rounded-2xl p-4 sm:p-6 border border-laurel-green/20">
@@ -191,9 +228,23 @@ const PricingPage = () => {
                   )}
                 </div>
 
-                {isPro && !subscription?.isTrial ? (
+                {isPro && !subscription?.isTrial && subscription?.isOneTimePayment && subscription.renewalDueInDays !== null && subscription.renewalDueInDays <= 3 ? (
+                  <button
+                    onClick={handleUpgrade}
+                    disabled={upgrade.isPending}
+                    className="w-full py-2.5 text-center text-sm font-semibold text-white rounded-xl transition-opacity hover:opacity-90 disabled:opacity-50 bg-deep-bluish mb-5"
+                  >
+                    {upgrade.isPending ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 size={16} className="animate-spin" /> Redirecting...
+                      </span>
+                    ) : (
+                      "Renew Pro"
+                    )}
+                  </button>
+                ) : isPro && !subscription?.isTrial ? (
                   <div className="py-2.5 text-center text-sm font-semibold text-white bg-moderate-green rounded-xl mb-5">
-                    {subscription?.hasPaystackSubscription ? "Current Plan" : "Pro (Lifetime)"}
+                    Current Plan
                   </div>
                 ) : isPro && subscription?.isTrial ? (
                   <button
@@ -237,6 +288,7 @@ const PricingPage = () => {
                 </ul>
               </div>
             </div>
+            )}
           </div>
         </main>
       </div>
