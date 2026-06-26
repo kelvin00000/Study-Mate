@@ -97,7 +97,11 @@ export function useQuickChatStream() {
     );
 
     if (!response.ok || !response.body) {
-      throw new Error("Failed to connect to quick chat API");
+      let errorData: { type?: string; message?: string } = {};
+      try { errorData = await response.json(); } catch {}
+      const err = new Error(errorData.message ?? "Failed to connect to quick chat API");
+      (err as any).type = errorData.type;
+      throw err;
     }
 
     const reader = response.body.getReader();

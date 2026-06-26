@@ -39,7 +39,7 @@ const queryClient = new QueryClient({
       retry: (failureCount, error) => {
         const err = error as { type?: string };
         // Don't retry on auth or validation errors
-        if (err?.type === "UNAUTHORIZED" || err?.type === "VALIDATION_ERROR" || err?.type === "NOT_FOUND") {
+        if (err?.type === "UNAUTHORIZED" || err?.type === "VALIDATION_ERROR" || err?.type === "NOT_FOUND" || err?.type === "RATE_LIMITED" || err?.type === "SUBSCRIPTION_ERROR") {
           return false;
         }
         return failureCount < 2;
