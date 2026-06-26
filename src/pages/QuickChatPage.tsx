@@ -486,15 +486,15 @@ const QuickChatPage = () => {
           queryClient.invalidateQueries({ queryKey: ["quickConversations"] });
         }
       );
-    } catch {
+    } catch (err: any) {
       setStreamingContent("");
       setStreaming(false);
+      const msg = err?.type === "SUBSCRIPTION_ERROR"
+        ? err.message
+        : "Sorry, I ran into an issue. Please try again.";
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, I ran into an issue. Please try again.",
-        },
+        { role: "assistant", content: msg },
       ]);
     }
   };

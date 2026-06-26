@@ -18,6 +18,20 @@ export async function apiCall(url: string, options: RequestInit) {
     } as ApiError;
   }
 
+  // Rate limited
+  if (response.status === 429) {
+    let message = "Too many requests, please try again later.";
+    try {
+      const body = await response.json();
+      if (body?.message) message = body.message;
+    } catch {}
+    throw {
+      success: false,
+      type: "RATE_LIMITED",
+      message,
+    } as ApiError;
+  }
+
   // 5xx server errors — may not have a JSON body
   if (response.status >= 500) {
     let message = "Something went wrong on our end. Please try again.";
