@@ -14,6 +14,8 @@ export interface SubscriptionStatus {
   hasPaystackSubscription: boolean;
   isTrial: boolean;
   isEarlyAdopter: boolean;
+  isOneTimePayment: boolean;
+  renewalDueInDays: number | null;
   limits: {
     maxCourses: number | null;
     chatMessagesPerDay: number | null;

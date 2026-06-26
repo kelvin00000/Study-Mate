@@ -7,12 +7,11 @@ import {
   MessageCircle,
   Trophy,
   Plus,
-
   X,
   Settings,
   ChevronDown,
   Crown,
-
+  CreditCard,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
@@ -136,6 +135,19 @@ function SidebarContent({
           Settings
         </Link>
 
+        <Link
+          to="/pricing"
+          onClick={onClose}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm mb-0.5 text-moderate-green/70 font-medium transition-all hover:bg-gray-100"
+        >
+          <CreditCard size={18} />
+          Billing
+          {!subscriptionLoading && isFree && (
+            <span className="ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-600">
+              <Crown size={10} /> PRO
+            </span>
+          )}
+        </Link>
 
         <UserButton
           showName={true}
