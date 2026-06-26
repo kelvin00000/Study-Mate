@@ -73,7 +73,7 @@ function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
         )}
       </span>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <div className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg bg-moderate-green/10 text-moderate-green">
           <Flame size={11} />
           {entry.currentStreak}d
@@ -111,7 +111,7 @@ export function LeaderboardModal({ open, onClose }: LeaderboardModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-xs sm:max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="px-5 py-4 border-b border-laurel-green/20 flex items-center justify-between">

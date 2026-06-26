@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Lock,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Sidebar } from "../components/dashboard/Sidebar";
 import { CreateCourseModal } from "../components/dashboard/CreateCourseModal";
+import { QueryErrorState } from "../components/QueryErrorState";
 import { useCourse } from "../hooks/useCourses";
 
 const CourseDetailPage = () => {
@@ -55,18 +56,13 @@ const CourseDetailPage = () => {
           )}
 
           {isError && (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <div className="text-5xl mb-4">🔍</div>
-              <p className="text-base font-medium mb-2 text-deep-bluish">
-                Course not found.
-              </p>
-              <Link
-                to="/courses"
-                className="text-sm font-medium transition-opacity hover:opacity-70 text-moderate-green"
-              >
-                Back to My Courses
-              </Link>
-            </div>
+            <QueryErrorState
+              title="Couldn't load course"
+              message="This course may not exist or the server is temporarily unavailable."
+              onRetry={() => window.location.reload()}
+              backTo="/courses"
+              backLabel="Back to My Courses"
+            />
           )}
 
           {!isLoading && !isError && course && (

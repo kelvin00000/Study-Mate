@@ -49,23 +49,23 @@ const AchievementsPage = () => {
 
             {/* Stats Summary */}
             {isLoading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-10">
                 {[1, 2, 3, 4].map((n) => (
-                  <div key={n} className="bg-white rounded-2xl p-5 border border-laurel-green/20 animate-pulse">
+                  <div key={n} className="bg-white rounded-2xl p-3.5 sm:p-5 border border-laurel-green/20 animate-pulse">
                     <div className="h-4 w-20 rounded bg-gray-100 mb-3" />
                     <div className="h-7 w-16 rounded bg-gray-100" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-10">
                 {STAT_CARDS.map(({ label, key, icon: Icon, format }) => (
-                  <div key={key} className="bg-white rounded-2xl p-5 border border-laurel-green/20">
+                  <div key={key} className="bg-white rounded-2xl p-3.5 sm:p-5 border border-laurel-green/20">
                     <div className="flex items-center gap-2 mb-2">
                       <Icon size={16} className="text-moderate-green" />
                       <span className="text-xs font-medium text-moderate-green/70">{label}</span>
                     </div>
-                    <p className="text-2xl font-semibold text-deep-bluish">
+                    <p className="text-xl sm:text-2xl font-semibold text-deep-bluish">
                       {format(stats?.[key] ?? 0)}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ const AchievementsPage = () => {
                           return (
                             <div
                               key={achievement.id}
-                              className={`relative bg-white rounded-2xl p-5 border transition-all ${
+                              className={`relative bg-white rounded-2xl p-4 sm:p-5 border transition-all ${
                                 unlocked
                                   ? "border-moderate-green/30"
                                   : "border-laurel-green/20 opacity-70"

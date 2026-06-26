@@ -45,6 +45,7 @@ export default function OnboardingPage() {
         setShowLoader(true);
         try {
             await submitPreference(onboardingInfo);
+            sessionStorage.setItem("sm:justOnboarded", "1");
             await user!.reload();
             navigate('/dashboard');
         } catch (err) {
@@ -100,54 +101,58 @@ export default function OnboardingPage() {
         <>
             <title>On Boarding</title>
 
-            <main className="h-screen bg-light-cream p-2">
-                <section className="py-4 px-2.5 lg:px-5 w-full h-full rounded-4xl bg-white">
+            <main className="min-h-[100dvh] bg-light-cream p-2">
+                <section className="py-4 px-2.5 lg:px-5 w-full min-h-[calc(100dvh-16px)] rounded-4xl bg-white flex flex-col">
                     <Logo subtitle="Learn. Focus. Achieve" />
 
-                    <div className="flex items-center h-[94%]">
-                        <div className="flex flex-col items-center h-full w-full lg:w-1/2">
+                    <div className="flex flex-1 min-h-0">
+                        <div className="flex flex-col items-center flex-1 min-h-0 w-full lg:w-1/2">
 
-                            <AnimatePresence mode="wait">
-                                {step < 5
-                                    ? (
-                                        <StepForm
-                                            id={step+1}
-                                            key={onboardingSteps[step].id}
-                                            title={onboardingSteps[step].title}
-                                            highlight={onboardingSteps[step].highlight}
-                                            description={onboardingSteps[step].description}
-                                            options={onboardingSteps[step].options}
-                                            finalQuestion={onboardingSteps[step].finalQuestion}
-                                            setLatestStepSelection={setLatestStepSelection}
-                                        />
-                                    ) : step === 5 ?(
-                                        <InterestsForm key="interests-form" selectedInterests={selectedInterests} setSelectedInterests={setSelectedInterests} />
-                                    ): step > 5 ?(
-                                        <FinalOnboardingScreen onboardingInfo={onboardingInfo} />
-                                    ): ''
-                                }
-                            </AnimatePresence>
+                            <div className="flex-1 min-h-0 overflow-y-auto w-full">
+                                <AnimatePresence mode="wait">
+                                    {step < 5
+                                        ? (
+                                            <StepForm
+                                                id={step+1}
+                                                key={onboardingSteps[step].id}
+                                                title={onboardingSteps[step].title}
+                                                highlight={onboardingSteps[step].highlight}
+                                                description={onboardingSteps[step].description}
+                                                options={onboardingSteps[step].options}
+                                                finalQuestion={onboardingSteps[step].finalQuestion}
+                                                setLatestStepSelection={setLatestStepSelection}
+                                            />
+                                        ) : step === 5 ?(
+                                            <InterestsForm key="interests-form" selectedInterests={selectedInterests} setSelectedInterests={setSelectedInterests} />
+                                        ): step > 5 ?(
+                                            <FinalOnboardingScreen onboardingInfo={onboardingInfo} />
+                                        ): ''
+                                    }
+                                </AnimatePresence>
+                            </div>
 
-                            <div className="m-0 text-laurel-green text-[14px]">*You can always change these in settings*</div>
+                            <div className="shrink-0 flex flex-col items-center w-full pb-4 pt-3 gap-3">
+                                <p className="text-laurel-green text-xs tracking-wide opacity-70">You can always change these in settings</p>
 
-                            <button
-                                onClick={()=>{
-                                    if(step>6) return;
-                                    handleSubmit();
-                                }}
-                                className="mt-3 lg:mt-4 flex min-h-13.75 w-[90%] lg:w-[60%] items-center justify-between rounded-2xl bg-deep-bluish px-6 text-lg font-semibold text-white shadow-[0_10px_30px_rgba(13,58,53,0.2)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-pointer">
-                                <span>Continue</span>
+                                <button
+                                    onClick={()=>{
+                                        if(step>6) return;
+                                        handleSubmit();
+                                    }}
+                                    className="flex min-h-13 w-[90%] lg:w-[60%] items-center justify-between rounded-2xl bg-deep-bluish px-6 text-base font-semibold text-white shadow-[0_10px_30px_rgba(13,58,53,0.2)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.98] cursor-pointer">
+                                    <span>Continue</span>
 
-                                <div className="flex h-7 lg:h-9 w-7 lg:w-9 items-center justify-center rounded-full bg-white">
-                                    <ArrowRight size={20} className="text-deep-bluish" />
-                                </div>
-                            </button>
+                                    <div className="flex h-7 lg:h-9 w-7 lg:w-9 items-center justify-center rounded-full bg-white/15">
+                                        <ArrowRight size={18} className="text-white" />
+                                    </div>
+                                </button>
 
-                            <ProgressBar step={step} totalSteps={6} />
+                                <ProgressBar step={step} totalSteps={6} />
+                            </div>
                         </div>
 
-                        <div className="hidden lg:flex items-center justify-center w-1/2 h-full">
-                            <img src="/image-5.png" className="w-[80%] object-cover" />
+                        <div className="hidden lg:flex items-center justify-center w-1/2">
+                            <img src="/image-5.png" alt="Student learning illustration" className="w-[80%] object-cover" />
                         </div>
                     </div>
                 </section>
@@ -174,7 +179,7 @@ type ProgressProps = {
 
 const ProgressBar = ({ step, totalSteps }: ProgressProps) => {
   return (
-    <div className="mt-4 flex items-center justify-center gap-3 w-full">
+    <div className="flex items-center justify-center gap-2 w-full">
         {Array.from({ length: totalSteps }).map((_, index) => {
             const active = index <= step-1;
 
@@ -182,10 +187,10 @@ const ProgressBar = ({ step, totalSteps }: ProgressProps) => {
                 <div
                     key={index}
                     className={`
-                        h-2 w-10 rounded-full transition-all duration-500 ease-in-out
+                        h-1.5 rounded-full transition-all duration-500 ease-in-out
                         ${active
-                            ? "bg-moderate-green"
-                            : "bg-laurel-green/30"
+                            ? "bg-moderate-green w-10"
+                            : "bg-laurel-green/20 w-7"
                         }
                     `}
                 />

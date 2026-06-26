@@ -21,6 +21,7 @@ export function useObjectives(courseId: string | undefined, topicId: string | un
       return fetchObjectives(token!, courseId!, topicId!);
     },
     enabled: !!courseId && !!topicId,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

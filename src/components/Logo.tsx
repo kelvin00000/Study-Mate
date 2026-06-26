@@ -8,7 +8,7 @@ export default function Logo({ subtitle }: props){
     return(
         <div className="inline-block font-normal">
             <div className="flex gap-3">
-                <img src="/logo.png" className="w-12 h-12 rounded-[12px]" />
+                <img src="/logo.png" alt="StudyMate logo" className="w-12 h-12 rounded-[12px]" />
 
                 <div className="flex flex-col">
                     <span className="font-bold">Study Mate</span>

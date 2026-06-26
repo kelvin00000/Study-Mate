@@ -121,11 +121,11 @@ const SettingsPage = () => {
             </p>
 
             {/* Profile */}
-            <section className="bg-white rounded-2xl p-6 mb-6 border border-laurel-green/20">
+            <section className="bg-white rounded-2xl p-4 sm:p-6 mb-6 border border-laurel-green/20">
               <h2 className="text-base font-semibold mb-4 text-deep-bluish">
                 Profile
               </h2>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <img
                   src={user?.imageUrl}
                   alt={user?.fullName ?? 'Avatar'}
@@ -143,7 +143,7 @@ const SettingsPage = () => {
             </section>
 
             {/* Subscription */}
-            <section className="bg-white rounded-2xl p-6 mb-6 border border-laurel-green/20">
+            <section className="bg-white rounded-2xl p-4 sm:p-6 mb-6 border border-laurel-green/20">
               <h2 className="text-base font-semibold mb-4 text-deep-bluish">
                 Subscription
               </h2>
@@ -222,7 +222,7 @@ const SettingsPage = () => {
             </section>
 
             {/* Learning Preferences */}
-            <section className="bg-white rounded-2xl p-6 mb-6 border border-laurel-green/20">
+            <section className="bg-white rounded-2xl p-4 sm:p-6 mb-6 border border-laurel-green/20">
               <h2 className="text-base font-semibold mb-5 text-deep-bluish">
                 Learning Preferences
               </h2>
@@ -258,7 +258,7 @@ const SettingsPage = () => {
                                 onClick={() =>
                                   setSelections(prev => ({ ...prev, [stepIdx]: opt.title }))
                                 }
-                                className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-sm font-medium border transition-all ${
                                   active
                                     ? 'text-white border-transparent bg-moderate-green'
                                     : 'text-moderate-green/70 border-laurel-green/20 hover:border-moderate-green hover:text-moderate-green'
@@ -277,7 +277,7 @@ const SettingsPage = () => {
             </section>
 
             {/* Interests */}
-            <section className="bg-white rounded-2xl p-6 mb-8 border border-laurel-green/20">
+            <section className="bg-white rounded-2xl p-4 sm:p-6 mb-8 border border-laurel-green/20">
               <h2 className="text-base font-semibold mb-1 text-deep-bluish">
                 Interests
               </h2>
@@ -315,7 +315,7 @@ const SettingsPage = () => {
                             : [...prev, interest]
                         )
                       }
-                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                      className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-sm font-medium border transition-all ${
                         selected
                           ? 'text-white border-transparent bg-moderate-green'
                           : 'text-moderate-green/70 border-laurel-green/20 hover:border-moderate-green hover:text-moderate-green'

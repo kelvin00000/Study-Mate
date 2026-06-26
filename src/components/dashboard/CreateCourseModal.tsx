@@ -151,7 +151,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Close button */}
             {!busy && (
@@ -171,7 +171,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -16 }}
                   transition={{ duration: 0.18 }}
-                  className="p-7"
+                  className="p-4 sm:p-7"
                 >
                   {/* Badge */}
                   <div className="flex justify-center mb-5">
@@ -238,7 +238,7 @@ export function CreateCourseModal({ open, onClose }: CreateCourseModalProps) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 16 }}
                   transition={{ duration: 0.18 }}
-                  className="p-7"
+                  className="p-4 sm:p-7"
                 >
                   {/* Back button */}
                   <button

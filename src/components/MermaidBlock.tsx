@@ -1,7 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import mermaid from 'mermaid';
-
-mermaid.initialize({ startOnLoad: false, theme: 'neutral', fontFamily: 'Roboto, sans-serif' });
+import DOMPurify from 'dompurify';
 
 export function MermaidBlock({ code }: { code: string }) {
   const id = `m${useId().replace(/:/g, '')}`;
@@ -9,10 +7,19 @@ export function MermaidBlock({ code }: { code: string }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    mermaid
-      .render(id, code.trim())
-      .then(({ svg }) => setSvg(svg))
-      .catch(() => setError(true));
+    let cancelled = false;
+    import('mermaid').then(({ default: mermaid }) => {
+      mermaid.initialize({ startOnLoad: false, theme: 'neutral', fontFamily: 'Roboto, sans-serif' });
+      mermaid
+        .render(id, code.trim())
+        .then(({ svg }) => {
+          if (!cancelled) setSvg(DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true } }));
+        })
+        .catch(() => {
+          if (!cancelled) setError(true);
+        });
+    });
+    return () => { cancelled = true; };
   }, [id, code]);
 
   if (error)

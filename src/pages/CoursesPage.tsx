@@ -61,11 +61,11 @@ const CoursesPage = () => {
           onSearchChange={setSearch}
         />
 
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 px-4 py-5 sm:p-6 lg:p-8">
           {/* Page header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold mb-1 text-deep-bluish">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 text-deep-bluish">
                 My Courses
               </h1>
               <p className="text-sm text-moderate-green/70">
@@ -74,7 +74,7 @@ const CoursesPage = () => {
             </div>
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-deep-bluish w-full sm:w-auto justify-center"
             >
               <Plus size={16} />
               New Course
@@ -89,7 +89,7 @@ const CoursesPage = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveFilter(tab.key)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-moderate-green text-white' : 'bg-laurel-green/20 text-moderate-green/70'}`}
+                  className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${isActive ? 'bg-moderate-green text-white' : 'bg-laurel-green/20 text-moderate-green/70'}`}
                 >
                   {tab.label}
                   <span

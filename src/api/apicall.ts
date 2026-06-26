@@ -6,24 +6,47 @@ export interface ApiError {
 }
 export async function apiCall(url: string, options: RequestInit) {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  
-    
-  const response = await fetch(`${baseUrl}${url}`, options);
 
-  // Try to parse JSON body (could fail if server doesn't send JSON)
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}${url}`, options);
+  } catch {
+    throw {
+      success: false,
+      type: "NETWORK_ERROR",
+      message: "Unable to reach the server. Please check your internet connection.",
+    } as ApiError;
+  }
+
+  // 5xx server errors — may not have a JSON body
+  if (response.status >= 500) {
+    let message = "Something went wrong on our end. Please try again.";
+    try {
+      const body = await response.json();
+      if (body?.message) message = body.message;
+    } catch {
+      // no parseable body
+    }
+    throw {
+      success: false,
+      type: "SERVER_ERROR",
+      message,
+    } as ApiError;
+  }
+
+  // Try to parse JSON body
   let data;
   try {
     data = await response.json();
   } catch {
     throw {
+      success: false,
       type: "NETWORK_ERROR",
       message: "Invalid server response",
-    };
+    } as ApiError;
   }
 
   if (!response.ok) {
-    // This is an error response
-    // Assume server sends structured error matching ApiError interface
     const error: ApiError = data;
     throw error;
   }

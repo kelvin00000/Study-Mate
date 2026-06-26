@@ -41,7 +41,7 @@ function SidebarContent({
 }) {
   const location = useLocation();
   const { data: conversations } = useConversations();
-  const { data: subscription } = useSubscription();
+  const { data: subscription, isLoading: subscriptionLoading } = useSubscription();
   const isFree = !subscription || subscription.plan === "free";
   const [recentChatsOpen, setRecentChatsOpen] = useState(true);
   const recentChats = (conversations ?? []).slice(0, 5);
@@ -70,7 +70,10 @@ function SidebarContent({
                 className="container-hover:text-gray-900"
               />
               {label}
-              {label === "Quick Chat" && isFree && (
+              {label === "Quick Chat" && subscriptionLoading && (
+                <span className="ml-auto w-12 h-5 rounded bg-gray-200 animate-pulse" />
+              )}
+              {label === "Quick Chat" && !subscriptionLoading && isFree && (
                 <span className="ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-600">
                   <Crown size={10} /> PRO
                 </span>
